@@ -65,7 +65,7 @@ def main():
         print ("\r\n\r\nUnknown Option Selected!\r\n\r\n")
     time.sleep(2)
     infile_name = input("Please give the absolute path of the backup file: ")
-    dest_name = input("\r\n\r\nPlease provide a name for the mailbox you would like to create: ")
+    dest_name = (input("\r\n\r\nPlease provide a name for the mailbox you would like to create: ") + ".mbox")
     if debug:
         time.sleep(1)
         print ("Input is:  " + infile_name)
