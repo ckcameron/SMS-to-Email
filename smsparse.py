@@ -26,7 +26,7 @@ def main():
     time.sleep(2)
     print("2. The contact names from your contacts application have been associated with their appriate message and anything without a contact name will be marked as from Unknown\r\n\r\n")
     time.sleep(2)
-    print("3. The mail client you are using can import the .mbox format, or the .email files output in the newly created sms directory. Both the directory and mbox file will appear whereever you ran this script\r\n\r\n\r\n\r\n")
+    print("3. The mail client you are using can import the .mbox format, or the .eml files output in the newly created sms directory. Both the directory and mbox file will appear whereever you ran this script\r\n\r\n\r\n\r\n")
     time.sleep(2)
     name = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
     time.sleep(1)
