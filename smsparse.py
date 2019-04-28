@@ -19,161 +19,183 @@ import string
 import sys
 import time
 import unicodedata
+from email.parser import BytesParser, Parser
+from email.policy import default
 
 global debug
 debug = True
 
 def main():
-    
-    #Print basic inforamtion about the script
-    
-    print ("This script will parse an XML file and output a .mbox file in the current directory\r\n and a directory named sms both containing all of the messages found in the XML file.\r\n\r\n")
-    time.sleep(3)
-    print("The script is intended only to parse XML output from the Android application SMS Backup and Restore and will work with no other format.\r\n\r\nPlease note that MMS and advanced message content are not supported yet.\r\n\r\n")
-    time.sleep(3)
-    print("The script makes a few basic assumptions about the backup it is parsing:\r\n\r\n")
-    time.sleep(3)
-    print("1. The mobile carrier and number that the messages are associated with is the same across the entire backup\r\n\r\n")
-    time.sleep(3)
-    print("2. The contact names from your contacts application have been associated with their appriate message and anything without a contact name will be marked as from Unknown\r\n\r\n")
-    time.sleep(3)
-    print("3. The mail client you are using can import the .mbox format, or the .eml files output in the newly created sms directory. Both the directory and mbox file will appear whereever you ran this script\r\n\r\n\r\n\r\n")
-    time.sleep(2)
 
-    #gather user input for name, mobile number, carrier, desired filename and backuplocation
+    try:        
+        #Print basic inforamtion about the script
     
-    name = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
-    time.sleep(1)
-    number = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
-    time.sleep(1)
-    print ("\r\nMobile number recorded as: " + number +"\r\n\r\n")
-    def menu():
-        print (30 * "-", "MOBILE CARRIER" , 30 * "-")
-        print ("1. Verizon")
-        print ("2. T-Mobile")
-        print ("3. AT&T")
-        print ("4. Sprint")
-        print ("5. Other")
-    time.sleep(2)
-    menu()
-    time.sleep(2)
+        print ("This script will parse an XML file and output a .mbox file in the current directory\r\n and a directory named sms both containing all of the messages found in the XML file.\r\n\r\n")
+        time.sleep(3)
+        print("The script is intended only to parse XML output from the Android application SMS Backup and Restore and will work with no other format.\r\n\r\nPlease note that MMS and advanced message content are not supported yet.\r\n\r\n")
+        time.sleep(3)
+        print("The script makes a few basic assumptions about the backup it is parsing:\r\n\r\n")
+        time.sleep(3)
+        print("1. The mobile carrier and number that the messages are associated with is the same across the entire backup\r\n\r\n")
+        time.sleep(3)
+        print("2. The contact names from your contacts application have been associated with their appriate message and anything without a contact name will be marked as from Unknown\r\n\r\n")
+        time.sleep(3)
+        print("3. The mail client you are using can import the .mbox format, or the .eml files output in the newly created sms directory. Both the directory and mbox file will appear whereever you ran this script\r\n\r\n\r\n\r\n")
+        time.sleep(2)
+
+        #gather user input for name, mobile number, carrier, desired filename and backuplocation
+    
+        name = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
+        time.sleep(1)
+        number = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
+        time.sleep(1)
+        print ("\r\nMobile number recorded as: " + number +"\r\n\r\n")
+        def menu():
+            print (30 * "-", "MOBILE CARRIER" , 30 * "-")
+            print ("1. Verizon")
+            print ("2. T-Mobile")
+            print ("3. AT&T")
+            print ("4. Sprint")
+            print ("5. Other")
+        time.sleep(2)
+        menu()
+        time.sleep(2)
         
         #a menu for selecting the mobile carrier (US Specific)
     
-    selection = input("\r\nEnter the number corresponding to your mobile carrier above: ")
-    if selection =='1':
-        print ("Verizon")
-        SMSemailSuffix = "vtext.com"
-    elif selection == '2':
-        print ("T-Mobile")
-        SMSemailSuffix = "tmomail.net"
-    elif selection == '3':
-        print ("AT&T")
-        SMSemailSuffix = "txt.att.net"
-    elif selection == '4':
-        print ("Sprint")
-        SMSemailSuffix = "messaging.sprintpcs.com"
-    elif selection == '5':
-        SMSemailSuffix = input("Please enter the sms email suffix for your mobile carrier (vtext.com, for example): ")
-        print ("\r\nThe SMS email suffix has been recoded as : ")
-        print (SMSemailSuffix)
-        print ("\r\n\r\n")
-    else:
-        print ("\r\n\r\nUnknown Option Selected!\r\n\r\n")
-    time.sleep(2)
-    infile_name = input("\r\n\r\n\r\n\r\nPlease give the absolute path of the backup file: ")
-    dest_name = (input("\r\n\r\nPlease provide a name for the mailbox you would like to create: ") + ".mbox")
-    if debug:
-        time.sleep(1)
-        print ("\r\n\r\nInput is:  " + infile_name)
-        print ("\r\n\r\nOutput is: " + dest_name)
-        time.sleep(5)
-        print("\r\n\r\n\r\nHold on, this could take a whiile, depending on the number of messages being processed.\r\n\r\n")
-    #declare some variables and lock the destination output file
+        selection = input("\r\nEnter the number corresponding to your mobile carrier above: ")
+        if selection =='1':
+            print ("Verizon")
+            SMSemailSuffix = "vtext.com"
+        elif selection == '2':
+            print ("T-Mobile")
+            SMSemailSuffix = "tmomail.net"
+        elif selection == '3':
+            print ("AT&T")
+            SMSemailSuffix = "txt.att.net"
+        elif selection == '4':
+            print ("Sprint")
+            SMSemailSuffix = "messaging.sprintpcs.com"
+        elif selection == '5':
+            SMSemailSuffix = input("Please enter the sms email suffix for your mobile carrier (vtext.com, for example): ")
+            print ("\r\nThe SMS email suffix has been recoded as : ")
+            print (SMSemailSuffix)
+            print ("\r\n\r\n")
+        else:
+            print ("\r\n\r\nUnknown Option Selected!\r\n\r\n")
+        time.sleep(2)
+        infile_name = input("\r\n\r\n\r\n\r\nPlease give the absolute path of the backup file: ")
+        dest_name = (input("\r\n\r\nPlease provide a name for the mailbox you would like to create: ") + ".mbox")
+        if debug:
+            time.sleep(1)
+            print ("\r\n\r\nInput is:  " + infile_name)
+            print ("\r\n\r\nOutput is: " + dest_name)
+            time.sleep(5)
+            print("\r\n\r\n\r\nHold on, this could take a while, depending on the number of messages being processed.\r\n\r\n")
+        #declare some variables and lock the destination output file
     
-    dest_mbox = mailbox.mbox(dest_name, create=True)
-    dest_mbox.lock()
+        dest_mbox = mailbox.mbox(dest_name, create=True)
+        dest_mbox.lock()
     
-    #parse the backup file by XML tag atttribute
+        #parse the backup file by XML tag atttribute
     
-    doc = minidom.parse(infile_name)
+        doc = minidom.parse(infile_name)
     
-    sms = doc.getElementsByTagName("sms") 
-    smspath = "sms"
+        sms = doc.getElementsByTagName("sms") 
+        smspath = "sms"
     
-    #attempt to create the sms directory
+        #attempt to create the sms directory
     
-    try:  
-        os.mkdir(smspath)
-    except OSError:  
-        print ("Creation of the directory %s failed" % smspath)
-    else:  
-        print ("Successfully created the directory %s " % smspath + "\r\n\r\n\r\n")
+        try:  
+            os.mkdir(smspath)
+        except OSError:  
+            print ("Creation of the directory %s failed" % smspath)
+        else:  
+            print ("Successfully created the directory %s " % smspath + "\r\n\r\n\r\n")
     
-    # create the eml files based on data parsed out of the backup and user input
-    smscounter = 0
-    for i in sms:
+        # create the eml files based on data parsed out of the backup and user input
+        smscounter = 0
+        for i in sms:
 
-        filename = (i.getAttribute("contact_name") + " " + i.getAttribute("readable_date") + ".eml")
-        script_dir = os.path.dirname(__file__)
-        rel_path = "sms/"
-        filepath = os.path.join(script_dir, rel_path, filename)
-        with codecs.open(filepath, "w+") as file:
-            file.write("Date: ")
-            rawdate =   utils.parsedate_to_datetime(i.getAttribute("readable_date"))
-            message_date = utils.format_datetime(rawdate) 
-            file.write(message_date)
-            file.write("\r\n")
-            message_id = utils.make_msgid(idstring=None, domain="sms.smsparse-py.net")
-            file.write("Message-ID: ")
-            file.write(message_id + "\r\n")
-            file.write("From: ")
-            if i.getAttribute("type") == 1:
-                if i.getAttribute("contact_name") == "(unknown)":
-                    file.write("unknown <" + i.getAttribute("address") + "@unknown.email>" + "\r\nTo: " + name + " <" + number  + "@" + SMSemailSuffix + ">\r\n")
-                elif i.getAttribute("contact_name") == "null":
-                    file.write("unknown <" + i.getAttribute("address") + "@unknown.email>" + "\r\nTo: " + name + " <" + number  + "@" + SMSemailSuffix + ">\r\n")
-                else:
-                    file.write(i.getAttribute("contact_name") + " <" + i.getAttribute("address") + "@unkown.email> " + "\r\nTo: " + name + " <" + number  + "@" + SMSemailSuffix + ">\r\n"
+            filename = (i.getAttribute("contact_name") + " " + i.getAttribute("readable_date") + ".eml")
+            script_dir = os.path.dirname(__file__)
+            rel_path = "sms/"
+            filepath = os.path.join(script_dir, rel_path, filename)
+            with codecs.open(filepath, "w+") as file:
+                file.write("Date: ")
+                rawdate =   utils.parsedate_to_datetime(i.getAttribute("readable_date"))
+                message_date = utils.format_datetime(rawdate) 
+                file.write(message_date)
+                file.write("\r\n")
+                message_id = utils.make_msgid(idstring=None, domain="sms.smsparse-py.net")
+                file.write("Message-ID: ")
+                file.write(message_id + "\r\n")
+                file.write("From: ")
+                if i.getAttribute("type") == 1:
+                    if i.getAttribute("contact_name") == "(unknown)":
+                        file.write("unknown <" + i.getAttribute("address") + "@unknown.email>" + "\r\nTo: " + name + " <" + number  + "@" + SMSemailSuffix + ">\r\n")
+                    elif i.getAttribute("contact_name") == "null":
+                        file.write("unknown <" + i.getAttribute("address") + "@unknown.email>" + "\r\nTo: " + name + " <" + number  + "@" + SMSemailSuffix + ">\r\n")
+                    else:
+                        file.write(i.getAttribute("contact_name") + " <" + i.getAttribute("address") + "@unkown.email> " + "\r\nTo: " + name + " <" + number  + "@" + SMSemailSuffix + ">\r\n"
 )
-            else:
-                if i.getAttribute("contact_name") == "(unknown)":
-                        file.write(name + " <" + number + "@" + SMSemailSuffix + ">\r\nTo: " + i.getAttribute("contact_name") + " <" + i.getAttribute("address") + "@unkown.email>\r\n")
-                elif i.getAttribute("contact_name") == "null":
-                    file.write(name + " <" + number + "@" + SMSemailSuffix + ">\r\nTo: " + i.getAttribute("address") + "@unknown.email>\r\n")
                 else:
-                    file.write(name + " <" + number + "@" + SMSemailSuffix + ">\r\nTo: " + i.getAttribute("address") + "@unknown.email>\r\n")
-            file.write("Subject: ")
-            file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
-            file.write(i.getAttribute("body"))
-            file.close()
-            smscounter = (smscounter + 1)
-            print('Number of SMS files Processed: %s \r' % (smscounter))
-    print("\r\n\r\n")
+                    if i.getAttribute("contact_name") == "(unknown)":
+                            file.write(name + " <" + number + "@" + SMSemailSuffix + ">\r\nTo: " + i.getAttribute("contact_name") + " <" + i.getAttribute("address") + "@unkown.email>\r\n")
+                    elif i.getAttribute("contact_name") == "null":
+                        file.write(name + " <" + number + "@" + SMSemailSuffix + ">\r\nTo: " + i.getAttribute("address") + "@unknown.email>\r\n")
+                    else:
+                        file.write(name + " <" + number + "@" + SMSemailSuffix + ">\r\nTo: " + i.getAttribute("address") + "@unknown.email>\r\n")
+                file.write("Subject: ")
+                file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
+                file.write(i.getAttribute("body"))
+                file.close()
+                smscounter = (smscounter + 1)
+                print('Number of SMS files Processed: %s \r' % (smscounter))
+        print("\r\n\r\n")
     
-    # walk the sms directory and add all the eml files to the mbox file created
+        # walk the sms directory and add all the eml files to the mbox file created
     
-    mboxcounter = 0
-    smspath = os.path.join(script_dir, rel_path)
-    for r, d, f in os.walk(smspath):
-        for file in f:
-            if ".eml" in file:
-                with codecs.open(filepath, "r") as file:
-                    mboxmsg = mailbox.mboxMessage()
-                    mboxmsg.set_unixfrom('author Sat Feb 7 01:05:34 2019')
-                    msg['From'] = from_addr
-                    msg ['To']  = to_addr
-                    msg['Subject'] = subject
-                    msg.set_payload(file)
-                    dest_mbox.add(mboxmsg)
-                    dest_mbox.flush()
-                    file.close()
-                    mboxcounter = (mboxcounter + 1)
-                    print('Number of .eml files added to .mbox:  %s \r' % (mboxcounter))
-    
-    #unlock the mbox file when the loop finishes        
-    
-    dest_mbox.unlock()
-    print("Processing of the SMS backup file is complete.") 
-main()
+        mboxcounter = 0
+        smspath = os.path.join(script_dir, rel_path)
+        
+        for r, d, f in os.walk(smspath):
+            for file in f:
+                if ".eml" in file:
+                    with open(filepath, "rb") as file:
+                        def addFileToMbox( file, dest_mbox ):
+                            # Any additional preprocessing logic goes here, e.g. duplicate filter
+                            try:
+                                dest_mbox.add(file)
+                            except:
+                                dest_mbox.close()
+                                raise
 
+                        #headers = BytesParser(policy=default).parse(file)
+                        #mboxmsg = mailbox.mboxMessage()
+                        #mboxmsg['From'] = ('From: {}'.format(headers['from']))
+                        #mboxmsg ['To']  = ('To: {}'.format(headers['to']))
+                        #mboxmsg['Subject'] = ('Subject: {}'.format(headers['subject']))
+                        #mboxmsg.set_payload(file)
+                        #dest_mbox.add(mboxmsg)
+                        addFileToMbox(file, dest_mbox)
+                        #dest_mbox.flush()
+                        file.close()
+                        mboxcounter = (mboxcounter + 1)
+                        print('Number of .eml files added to .mbox:  %s \r' % (mboxcounter))
+    
+        #unlock the mbox file when the loop finishes        
+    
+        dest_mbox.unlock()
+        print("Processing of the SMS backup file is complete.") 
+        return 0
+    
+    #handle exceptions and cleanup
+    except Exception:
+        os.remove(os.path.join(script_dir, dest_mbox))
+        os.remove(os.path.join(script_dir, dest_mbox + ".lock"))
+        shutil.rmtree(smspath)
+        return 1
+
+if __name__ == '__main__':
+    sys.exit(main())
