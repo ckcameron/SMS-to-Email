@@ -137,7 +137,6 @@ def main():
             file.write("Subject: ")
             file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
             file.write(i.getAttribute("body"))
-<<<<<<< HEAD
             file.close()
         # walk the sms directory and add all the eml files to the mbox file created
         smspath = os.join(script_dir, rel_path)
@@ -149,12 +148,6 @@ def main():
                         dest_mbox.flush()
                         file close()
     #unlock the mbox file when the loop finishes        
-=======
-            dest_mbox.add(mailbox.mboxMessage(file))
-            dest_mbox.flush()
-            file.close()
-            
->>>>>>> a5f62f3c178c72430c0f0755a6ecb4e8d35425d4
     dest_mbox.unlock()
 
 main()
