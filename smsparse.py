@@ -17,6 +17,8 @@ from email import utils
 from datetime import datetime
 import string
 import sys
+from sys import *
+import shutil
 import time
 import unicodedata
 
@@ -149,7 +151,8 @@ def main():
                 file.write(i.getAttribute("body"))
                 file.close()
                 smscounter = (smscounter + 1)
-                print('Number of SMS files Processed: %s \r' % (smscounter))
+                stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
+        stdout.flush();
         print("\r\n\r\n")
     
         # walk the sms directory and add all the eml files to the mbox file created
@@ -173,18 +176,18 @@ def main():
                         addFileToMbox(file, dest_mbox)
                         file.close()
                         mboxcounter = (mboxcounter + 1)
-                        print('Number of .eml files added to .mbox:  %s \r' % (mboxcounter))
+                        stdout.write('Number of .eml files added to .mbox:  %s \r' % (mboxcounter))
     
         #unlock the mbox file when the loop finishes        
-    
+        stdout.flush();
         dest_mbox.unlock()
         print("Processing of the SMS backup file is complete.") 
         return 0
     
     #handle exceptions and cleanup
     except Exception:
-        os.remove(os.path.join(script_dir, dest_mbox))
-        os.remove(os.path.join(script_dir, dest_mbox + ".lock"))
+        os.remove(os.path.join(script_dir, dest_name))
+        os.remove(os.path.join(script_dir, dest_name + ".lock"))
         shutil.rmtree(smspath)
         return 1
 
