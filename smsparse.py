@@ -149,7 +149,7 @@ def main():
         
         # walk the sms directory and add all the eml files to the mbox file created
         
-        smspath = os.join(script_dir, rel_path)
+        smspath = os.path.join(script_dir, rel_path)
         for r, d, f in os.walk(smspath):
             for file in f:
                 if ".eml" in file:
