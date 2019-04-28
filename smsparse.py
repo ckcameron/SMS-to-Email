@@ -19,8 +19,6 @@ import string
 import sys
 import time
 import unicodedata
-from email.parser import BytesParser, Parser
-from email.policy import default
 
 global debug
 debug = True
