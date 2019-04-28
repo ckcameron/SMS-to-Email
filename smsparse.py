@@ -143,7 +143,7 @@ def main():
                     with codecs.open(filepath, "r") as file:
                         dest_mbbox.add(mailbox.mboxMessage(file))
                         dest_mbox.flush()
-                        file close()
+                        file.close()
     #unlock the mbox file when the loop finishes        
     dest_mbox.unlock()
 
