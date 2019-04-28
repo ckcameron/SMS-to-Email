@@ -88,7 +88,7 @@ def main():
         print ("\r\n\r\nInput is:  " + infile_name)
         print ("\r\n\r\nOutput is: " + dest_name)
         time.sleep(5)
-        print("\r\n\r\n\r\nHold on, this could take a whiile, depending on the number of messages being processed.\r\n\r\n"
+        print("\r\n\r\n\r\nHold on, this could take a whiile, depending on the number of messages being processed.\r\n\r\n")
     #declare some variables and lock the destination output file
     
     dest_mbox = mailbox.mbox(dest_name, create=True)
