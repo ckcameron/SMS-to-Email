@@ -147,9 +147,9 @@ def main():
             file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
             file.write(i.getAttribute("body"))
             file.close()
+            smscounter = (smscounter + 1)
             while smscounter > 0:
-                smscounter = (smscounter + 1)
-                print("Number of SMS files Processed: " + smscounter)
+                print('Number of SMS files Processed: [%d%]\r' %smscounter, end="")
         print("\r\n\r\n")
         # walk the sms directory and add all the eml files to the mbox file created
         mboxcounter = 0
@@ -161,9 +161,9 @@ def main():
                         dest_mbox.add(mailbox.mboxMessage(file))
                         dest_mbox.flush()
                         file.close()
+                        mboxcounter = (mboxcounter + 1)
                         while mboxcounter > 0:
-                            mboxcounter = (mboxcounter + 1)
-                            print("Number of .eml files added to .mbox: " + mboxcounter)
+                            print('Number of .eml files added to .mbox:  [%d%}\r ' %mboxcounter, end="")
     
     #unlock the mbox file when the loop finishes        
     
