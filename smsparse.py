@@ -149,7 +149,7 @@ def main():
             file.close()
             smscounter = (smscounter + 1)
             while smscounter > 0:
-                print('Number of SMS files Processed: [%d%]\r' %smscounter, end="")
+                print('Number of SMS files Processed: %s \r' % (smscounter))
         print("\r\n\r\n")
         # walk the sms directory and add all the eml files to the mbox file created
         mboxcounter = 0
@@ -163,7 +163,7 @@ def main():
                         file.close()
                         mboxcounter = (mboxcounter + 1)
                         while mboxcounter > 0:
-                            print('Number of .eml files added to .mbox:  [%d%}\r ' %mboxcounter, end="")
+                            print('Number of .eml files added to .mbox:  %s \r' % (mboxcounter))
     
     #unlock the mbox file when the loop finishes        
     
