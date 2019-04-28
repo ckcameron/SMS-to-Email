@@ -87,7 +87,8 @@ def main():
         time.sleep(1)
         print ("\r\n\r\nInput is:  " + infile_name)
         print ("\r\n\r\nOutput is: " + dest_name)
-    
+        time.sleep(5)
+        print("\r\n\r\n\r\nHold on, this could take a whiile, depending on the number of messages being processed.\r\n\r\n"
     #declare some variables and lock the destination output file
     
     dest_mbox = mailbox.mbox(dest_name, create=True)
@@ -107,10 +108,10 @@ def main():
     except OSError:  
         print ("Creation of the directory %s failed" % smspath)
     else:  
-        print ("Successfully created the directory %s " % smspath)
+        print ("Successfully created the directory %s " % smspath + "\r\n\r\n\r\n")
     
     # create the eml files based on data parsed out of the backup and user input
-    
+    smscounter = 0
     for i in sms:
 
         filename = (i.getAttribute("contact_name") + " " + i.getAttribute("readable_date") + ".eml")
@@ -146,21 +147,27 @@ def main():
             file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
             file.write(i.getAttribute("body"))
             file.close()
-        
+            while counter > 0:
+                smscounter = (smscounter + 1)
+                print("Number of SMS files Processed: " + smscounter)
+        print("\r\n\r\n")
         # walk the sms directory and add all the eml files to the mbox file created
-        
+        mboxcounter = 0
         smspath = os.path.join(script_dir, rel_path)
         for r, d, f in os.walk(smspath):
             for file in f:
                 if ".eml" in file:
                     with codecs.open(filepath, "r") as file:
-                        dest_mbbox.add(mailbox.mboxMessage(file))
+                        dest_mbox.add(mailbox.mboxMessage(file))
                         dest_mbox.flush()
                         file.close()
+                        while mboxcounter > 0:
+                            mboxcounter = (mboxcounter + 1)
+                            print("Number of .eml files added to .mbox: " + mboxcounter)
     
     #unlock the mbox file when the loop finishes        
     
     dest_mbox.unlock()
-
+    print("Processing of the SMS backup file is complete.") 
 main()
 
