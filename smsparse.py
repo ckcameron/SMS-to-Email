@@ -163,23 +163,16 @@ def main():
             for file in f:
                 if ".eml" in file:
                     with open(filepath, "rb") as file:
+                        
+                        #define a function and a try loop for adding the eml files to the mbox file
+                        
                         def addFileToMbox( file, dest_mbox ):
-                            # Any additional preprocessing logic goes here, e.g. duplicate filter
                             try:
                                 dest_mbox.add(file)
                             except:
                                 dest_mbox.close()
                                 raise
-
-                        #headers = BytesParser(policy=default).parse(file)
-                        #mboxmsg = mailbox.mboxMessage()
-                        #mboxmsg['From'] = ('From: {}'.format(headers['from']))
-                        #mboxmsg ['To']  = ('To: {}'.format(headers['to']))
-                        #mboxmsg['Subject'] = ('Subject: {}'.format(headers['subject']))
-                        #mboxmsg.set_payload(file)
-                        #dest_mbox.add(mboxmsg)
                         addFileToMbox(file, dest_mbox)
-                        #dest_mbox.flush()
                         file.close()
                         mboxcounter = (mboxcounter + 1)
                         print('Number of .eml files added to .mbox:  %s \r' % (mboxcounter))
