@@ -37,7 +37,12 @@ def main():
     time.sleep(3)
     print("3. The mail client you are using can import the .mbox format, or the .eml files output in the newly created sms directory. Both the directory and mbox file will appear whereever you ran this script\r\n\r\n\r\n\r\n")
     time.sleep(2)
+<<<<<<< HEAD
     #gather user input for name, mobile number, carrier, desired filename and backuplocation
+=======
+    print("3. The mail client you are using can import the .mbox format, or the .eml files output in the newly created sms directory. Both the directory and mbox file will appear whereever you ran this script\r\n\r\n\r\n\r\n")
+    time.sleep(2)
+>>>>>>> a5f62f3c178c72430c0f0755a6ecb4e8d35425d4
     name = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
     time.sleep(1)
     number = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
@@ -132,6 +137,7 @@ def main():
             file.write("Subject: ")
             file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
             file.write(i.getAttribute("body"))
+<<<<<<< HEAD
             file.close()
         # walk the sms directory and add all the eml files to the mbox file created
         smspath = os.join(script_dir, rel_path)
@@ -143,6 +149,12 @@ def main():
                         dest_mbox.flush()
                         file close()
     #unlock the mbox file when the loop finishes        
+=======
+            dest_mbox.add(mailbox.mboxMessage(file))
+            dest_mbox.flush()
+            file.close()
+            
+>>>>>>> a5f62f3c178c72430c0f0755a6ecb4e8d35425d4
     dest_mbox.unlock()
 
 main()
