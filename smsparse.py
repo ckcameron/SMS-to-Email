@@ -24,7 +24,9 @@ global debug
 debug = True
 
 def main():
+    
     #Print basic inforamtion about the script
+    
     print ("This script will parse an XML file and output a .mbox file in the current directory\r\n and a directory named sms both containing all of the messages found in the XML file.\r\n\r\n")
     time.sleep(3)
     print("The script is intended only to parse XML output from the Android application SMS Backup and Restore and will work with no other format.\r\n\r\nPlease note that MMS and advanced message content are not supported yet.\r\n\r\n")
@@ -37,9 +39,9 @@ def main():
     time.sleep(3)
     print("3. The mail client you are using can import the .mbox format, or the .eml files output in the newly created sms directory. Both the directory and mbox file will appear whereever you ran this script\r\n\r\n\r\n\r\n")
     time.sleep(2)
+
     #gather user input for name, mobile number, carrier, desired filename and backuplocation
-    print("3. The mail client you are using can import the .mbox format, or the .eml files output in the newly created sms directory. Both the directory and mbox file will appear whereever you ran this script\r\n\r\n\r\n\r\n")
-    time.sleep(2)
+    
     name = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
     time.sleep(1)
     number = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
@@ -55,7 +57,9 @@ def main():
     time.sleep(2)
     menu()
     time.sleep(2)
+        
         #a menu for selecting the mobile carrier (US Specific)
+    
     selection = input("\r\nEnter the number corresponding to your mobile carrier above: ")
     if selection =='1':
         print ("Verizon")
@@ -83,23 +87,30 @@ def main():
         time.sleep(1)
         print ("\r\n\r\nInput is:  " + infile_name)
         print ("\r\n\r\nOutput is: " + dest_name)
+    
     #declare some variables and lock the destination output file
+    
     dest_mbox = mailbox.mbox(dest_name, create=True)
     dest_mbox.lock()
     
-    #partse the backup file by XML tag atttribute
+    #parse the backup file by XML tag atttribute
+    
     doc = minidom.parse(infile_name)
     
     sms = doc.getElementsByTagName("sms") 
     smspath = "sms"
+    
     #attempt to create the sms directory
+    
     try:  
         os.mkdir(smspath)
     except OSError:  
         print ("Creation of the directory %s failed" % smspath)
     else:  
         print ("Successfully created the directory %s " % smspath)
+    
     # create the eml files based on data parsed out of the backup and user input
+    
     for i in sms:
 
         filename = (i.getAttribute("contact_name") + " " + i.getAttribute("readable_date") + ".eml")
@@ -135,7 +146,9 @@ def main():
             file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
             file.write(i.getAttribute("body"))
             file.close()
+        
         # walk the sms directory and add all the eml files to the mbox file created
+        
         smspath = os.join(script_dir, rel_path)
         for r, d, f in os.walk(smspath):
             for file in f:
@@ -144,7 +157,9 @@ def main():
                         dest_mbbox.add(mailbox.mboxMessage(file))
                         dest_mbox.flush()
                         file.close()
+    
     #unlock the mbox file when the loop finishes        
+    
     dest_mbox.unlock()
 
 main()
