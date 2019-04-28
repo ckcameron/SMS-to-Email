@@ -147,7 +147,7 @@ def main():
             file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
             file.write(i.getAttribute("body"))
             file.close()
-            while counter > 0:
+            while smscounter > 0:
                 smscounter = (smscounter + 1)
                 print("Number of SMS files Processed: " + smscounter)
         print("\r\n\r\n")
