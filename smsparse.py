@@ -21,6 +21,14 @@ from sys import *
 import shutil
 import time
 import unicodedata
+#import atom.data
+#import gdata.data
+#import gdata.contacts.client
+##import gdata.contacts.data
+import phonenumbers
+from phonenumbers import carrier
+import mobile_codes
+import trunofficial
 
 global debug
 debug = True
@@ -49,14 +57,21 @@ def main():
         time.sleep(1)
         number = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
         time.sleep(1)
-        print ("\r\nMobile number recorded as: " + number + (2 * "\r\n"))
+        print("\r\nMobile number recorded as: " + number + (2 * "\r\n"))
+        gaccount = input("\r\nPlease enter thei Google account you wish to retrieve your contacts from: ")
         def menu():
-            print (30 * "-", "MOBILE CARRIER" , 30 * "-")
-            print ("1. Verizon")
-            print ("2. T-Mobile")
-            print ("3. AT&T")
-            print ("4. Sprint")
-            print ("5. Other")
+            print(30 * "-", "MOBILE CARRIER" , 30 * "-")
+            print("1.  Verizon")
+            print("2.  T-Mobile")
+            print("3.  AT&T")
+            print("4.  Sprint")
+            print("5.  Boost Mobile")
+            print("6.  Cricket")
+            print("7.  Metro PCS")
+            print("8.  Tracfone")
+            print("9.  US Cellular")
+            print("10. Virgin Mobile")
+            print("11. Other")
         time.sleep(2)
         menu()
         time.sleep(2)
@@ -65,18 +80,36 @@ def main():
     
         selection = input("\r\nEnter the number corresponding to your mobile carrier above: ")
         if selection =='1':
-            print ("Verizon")
+            print("Verizon")
             SMSemailSuffix = "vtext.com"
         elif selection == '2':
-            print ("T-Mobile")
+            print("T-Mobile")
             SMSemailSuffix = "tmomail.net"
         elif selection == '3':
-            print ("AT&T")
+            print("AT&T")
             SMSemailSuffix = "txt.att.net"
         elif selection == '4':
-            print ("Sprint")
+            print("Sprint")
             SMSemailSuffix = "messaging.sprintpcs.com"
         elif selection == '5':
+            print("Boost Mobile")
+            SMSemailSuffix = "@myboostmobile.com"
+        elif selection == '6':
+            print("Cricket")
+            SMSemailSuffix = "@sms.mycricket.com"
+        elif selection == '7':
+            print("Metro PCS")
+            SMSemailSuffix == "@mymetropcs.com"
+        elif selection == '8':
+            print("Tracfone")
+            SMSemailSuffix = "@mmst5.tracfone.com"
+        elif selection == '9':
+            print("US Cellular")
+            SMSemailSuffix = "@email.uscc.net"
+        elif selection == '10':
+            print("Virgin Mobile")
+            SMSemailSuffix = "@vmobl.com"
+        elif selection == '11':
             SMSemailSuffix = input("Please enter the sms email suffix for your mobile carrier (vtext.com, for example): ")
             print("\r\nThe SMS email suffix has been recoded as : ")
             print(SMSemailSuffix)
@@ -117,6 +150,32 @@ def main():
                 filename = (i.getAttribute("contact_name") + " " + i.getAttribute("readable_date") + ".eml")
                 rel_path = "sms/"
                 filepath = os.path.join(script_dir, rel_path, filename)
+                parsedNumber = phonenumbers.parse((i.getAttribute("address")), US)
+                formattedNumber = phonenumbers.format_number(parsedNumber, phonenumbers.PhoneNumberFormat.NATIONAL)
+                mobileCarrier = carrier.name_for_number(formattedNumber, "en")
+                googleContactName = i.getAttribute("contact_name")
+                if mobileCarrier == "Verizon":
+                    SMSemailAddress = (formattedNumber + "@vtext.com")
+                elif mobileCarrier == "T-Mobile":
+                    SMSemailAddress = (formattedNumber + "@tmomail.net")
+                elif mobileCarrier == "AT&T":
+                    SMSemailAddress = (formattedNumber + "@txt.att.net")
+                elif mobileCarrier == "Sprint":            
+                    SMSemailAddress = (formattedNumber + "@messaging.sprintpcs.com")
+                elif mobileCarrier == "Boost Mobile":
+                    SMSemailAddress = (formattedNumber + "@myboostmobile.com")
+                elif mobileCarrier == "Cricket":
+                    SMSemailAddress = (formatteedNumber + "@sms.mycricket.com")
+                elif mobileCarrier == "Metro PCS":
+                    SMSemailAddress = (formattedNumber + "@mymetropcs.com")
+                elif mobileCarrier == "Tracfone":
+                    SMSemailAddress = (formattedNumber + "@mmst5.tracfone.com")
+                elif mobileCarrier == "US Cellular":
+                    SMSemailAddress = (formattedNumber +"@email.uscc.net")
+                elif mobileCarrier == "Virgin Mobile":
+                    SMSemailAddress = (formattedNumber + "@vmobl.com")
+                else:
+                    SMSemailAddress = (formattedNumber + "@unknown-carrier.net")
                 with open(filepath, "w+") as file:
                     file.write("Date: ")
                     rawdate = utils.parsedate_to_datetime(i.getAttribute("readable_date"))
@@ -128,10 +187,10 @@ def main():
                     file.write(message_id + "\r\n")
                     file.write("From: ")
                     if i.getAttribute("type") == 1:
-                            file.write(i.getAttribute("address") + "\r\nTo: " + name + " <" + number  + "@" + SMSemailSuffix + ">\r\n"
+                            file.write(googleContactName +" <" + SMSemailAddress + ">" + "\r\nTo: " + name + " <" + number  + "@" + SMSemailSuffix + ">\r\n"
 )
                     else:
-                            file.write(name + " <" + number + "@" + SMSemailSuffix + ">\r\nTo: " + i.getAttribute("address") + "\r\n")
+                            file.write(name + " <" + number + "@" + SMSemailSuffix + ">\r\nTo: " + googleContactName + " <" + SMSemailAddress + ">\r\n")
                     file.write("Subject: ")
                     file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
                     file.write(i.getAttribute("body"))
