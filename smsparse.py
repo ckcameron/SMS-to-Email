@@ -58,7 +58,12 @@ def main():
         number = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
         time.sleep(1)
         print("\r\nMobile number recorded as: " + number + (2 * "\r\n"))
-        gaccount = input("\r\nPlease enter thei Google account you wish to retrieve your contacts from: ")
+        
+        #This feature awaits API approval from Google
+        #gacount = input("Please enter the Google account you wish to retrieve your contacts from: ")
+        
+        #a menu for selecting the mobile carrier (US Specific)
+
         def menu():
             print(30 * "-", "MOBILE CARRIER" , 30 * "-")
             print("1.  Verizon")
@@ -76,9 +81,9 @@ def main():
         menu()
         time.sleep(2)
         
-        #a menu for selecting the mobile carrier (US Specific)
-    
-        selection = input("\r\nEnter the number corresponding to your mobile carrier above: ")
+        # declare the approprite SMS email suffix based on carrier
+        
+        selection = input("\r\n****\r\n****\r\n\r\nEnter the number corresponding to your mobile carrier above: ")
         if selection =='1':
             print("Verizon")
             SMSemailSuffix = "vtext.com"
@@ -110,15 +115,15 @@ def main():
             print("Virgin Mobile")
             SMSemailSuffix = "@vmobl.com"
         elif selection == '11':
-            SMSemailSuffix = input("Please enter the sms email suffix for your mobile carrier (vtext.com, for example): ")
+            SMSemailSuffix = input("\r\nPlease enter the sms email suffix for your mobile carrier (vtext.com, for example): ")
             print("\r\nThe SMS email suffix has been recoded as : ")
             print(SMSemailSuffix)
             print(2 * "\r\n")
         else:
             print (2 * "\r\n", "Unknown Option Selected!", 2 * "\r\n")
         time.sleep(2)
-        infile_name = input("\r\n\r\nPlease give the absolute path of the backup file: ")
-        dest_name = (input("\r\n\r\nPlease provide a name for the mailbox you would like to create: ") + ".mbox")
+        infile_name = input("\r\n\r\nPlease give the absolute path of the backup file (.xml file): ")
+        dest_name = (input("\r\n\r\nPlease provide a name for the mailbox you would like to create (the .mbox atr the end of the filename will be added for you): ") + ".mbox")
         smspath = "sms"
         script_dir = os.path.dirname(__file__)
         time.sleep(1)
@@ -140,42 +145,78 @@ def main():
     
             doc = minidom.parse(infile_name)
             sms = doc.getElementsByTagName("sms") 
+            
+            #initialize the counters
+
             smscounter = 0
             mboxcounter = 0
+            
             #declare/create the mbox
     
             dest_mbox = mailbox.mbox(dest_name, create=True)
             
+            # loop through the messages and process them
+            
             for i in sms:
+                
+                #file related OS variables
+                
                 filename = (i.getAttribute("contact_name") + " " + i.getAttribute("readable_date") + ".eml")
                 rel_path = "sms/"
                 filepath = os.path.join(script_dir, rel_path, filename)
-                parsedNumber = phonenumbers.parse((i.getAttribute("address")), US)
-                formattedNumber = phonenumbers.format_number(parsedNumber, phonenumbers.PhoneNumberFormat.NATIONAL)
-                mobileCarrier = carrier.name_for_number(formattedNumber, "en")
-                googleContactName = i.getAttribute("contact_name")
-                if mobileCarrier == "Verizon":
+                
+                #For now we will rely on the contact anme in the backup file, but in the future 
+                #we will run the numbers against Google Contacts to retrieve the updated information
+                
+                if i.getAttribute("contact_name") != "(Unknown)":
+                    googleContactName = i.getAttribute("contact_name")
+                else:
+                    googleContactName = "Unknown"
+                
+                #format the phone number into something we can work with
+                
+                rawNumber = i.getAttribute("address")
+                                
+                #Lookup the mobile carrier for that number and declare the correct SMS email address based the returned carrier
+                
+                if (len(rawNumber) != 5) and (len(rawNumber) != 8):
+                    parsedNumber = phonenumbers.parse(rawNumber, "US")
+                    formattedNumber = phonenumbers.format_number(parsedNumber, phonenumbers.PhoneNumberFormat.NATIONAL)
+                    elevenDigitNumber = formattedNumber[1:]
+                    mobileCarrier = carrier.name_for_number(elevenDigitNumber, "en")
+                    print(mobileCarrier)
+                
+                else:
+                    mobileCarrier = "unknown"
+                    
+
+                if "Verizon" in mobileCarrier:
                     SMSemailAddress = (formattedNumber + "@vtext.com")
-                elif mobileCarrier == "T-Mobile":
+                elif "T-Mobile" in mobileCarrier:
                     SMSemailAddress = (formattedNumber + "@tmomail.net")
-                elif mobileCarrier == "AT&T":
+                elif "AT&T" in mobileCarrier:
                     SMSemailAddress = (formattedNumber + "@txt.att.net")
-                elif mobileCarrier == "Sprint":            
+                elif "Sprint" in mobileCarrier:            
                     SMSemailAddress = (formattedNumber + "@messaging.sprintpcs.com")
-                elif mobileCarrier == "Boost Mobile":
+                elif "Boost" in mobileCarrier:
                     SMSemailAddress = (formattedNumber + "@myboostmobile.com")
-                elif mobileCarrier == "Cricket":
+                elif "cket" in mobileCarrier:
                     SMSemailAddress = (formatteedNumber + "@sms.mycricket.com")
-                elif mobileCarrier == "Metro PCS":
+                elif "Metro" in mobileCarrier:
                     SMSemailAddress = (formattedNumber + "@mymetropcs.com")
-                elif mobileCarrier == "Tracfone":
+                elif "Trac" in mobileCarrier:
                     SMSemailAddress = (formattedNumber + "@mmst5.tracfone.com")
-                elif mobileCarrier == "US Cellular":
+                elif "US" in mobileCarrier:
                     SMSemailAddress = (formattedNumber +"@email.uscc.net")
-                elif mobileCarrier == "Virgin Mobile":
+                elif "Virgin" in mobileCarrier:
                     SMSemailAddress = (formattedNumber + "@vmobl.com")
+                elif mobileCarrier == "unknown":
+                    SMSemailAddress = (rawNumber + "@unknown-carrier.net")
                 else:
                     SMSemailAddress = (formattedNumber + "@unknown-carrier.net")
+               
+                #write out the email data now that things are parsed, looked-up, formatted and ready
+               
                 with open(filepath, "w+") as file:
                     file.write("Date: ")
                     rawdate = utils.parsedate_to_datetime(i.getAttribute("readable_date"))
@@ -191,12 +232,12 @@ def main():
 )
                     else:
                             file.write(name + " <" + number + "@" + SMSemailSuffix + ">\r\nTo: " + googleContactName + " <" + SMSemailAddress + ">\r\n")
-                    file.write("Subject: ")
+                    file.write("Subject: [SMS] ")
                     file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
                     file.write(i.getAttribute("body"))
                     file.close()
                     
-                    #define a function and a try loop for adding the eml files to the mbox fil
+                    #define a function and a try loop for adding the eml files to the mbox file
 
                     def addEMLtoMbox(file, dest_mbox):
                                 try:
@@ -212,22 +253,32 @@ def main():
                         addEMLtoMbox(file, dest_mbox)
                         file.close()
                         dest_mbox.unlock()
-                        smscounter = (smscounter + 1)
-                        stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
+                smscounter = (smscounter + 1)
+                #stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
             print(2 * "\r\n")       
-            stdout.flush();
-            print("Processing of the SMS backup file is complete. Find the eml files in the sms directory or they are all included in the mbox file just created with the name of your choosing.") 
-        return 0
+            #stdout.flush();
+            print("************************************\r\n***********************************\r\nProcessing of the SMS backup file is complete. Find the eml files in the sms directory or they are all included in the mbox file just created with the name of your choosing.") 
+            return 0
 
                             
     
                         
     #handle exceptions and cleanup
     except Exception:
-        os.remove(os.path.join(script_dir, dest_name))
-        os.remove(os.path.join(script_dir, dest_name) + ".lock")
-        shutil.rmtree(smspath)
-        return 1
+        lockfile = os.path.join(script_dir, dest_name + ".lock*")
+        mboxfile = os.path.join(script_dir, dest_file)
+        if os.path.exists(lockfile) and os.path.exists(mboxfile):
+            os.remove(lockfile)
+            os.remove(mboxfile)
+            shutil.rmtree(smspath)
+            return 1
+        elif os.path.exists(mboxfile):
+            os.remove(mboxfile)
+            shutil.rmtree(smspath)
+            return 1
+        else:
+            shutil.rmtree(smspath)
+            return 1
 
 if __name__ == '__main__':
     sys.exit(main())
