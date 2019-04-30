@@ -45,27 +45,26 @@ def main():
         time.sleep(3)
         print("The script makes a few basic assumptions about the backup it is parsing:", 2 * "\r\n")
         time.sleep(3)
-        print("1. The mobile carrier and number that the messages are associated with is the same across the entire backup", 2 * "\r\n")
+        print("1. The contact names from your contacts application have been associated with their appriate message and anything without a contact name will be marked as from Unknown for the time being until I can get API approoval from Google to check your Google contacts for the number", 2 * "\r\n")
         time.sleep(3)
-        print("2. The contact names from your contacts application have been associated with their appriate message and anything without a contact name will be marked as from Unknown", 2 * "\r\n")
-        time.sleep(3)
-        print("3. The mail client you are using can import the .mbox format, or the .eml files output in the newly created sms directory. Both the directory and mbox file will appear whereever you ran this script", 4 * "\r\n")
+        print("2. The mail client you are using can import the .mbox format, or the .eml files output in the newly created sms directory. Both the directory and mbox file will appear whereever you ran this script", 4 * "\r\n")
         time.sleep(2)
 
         #gather user input for name, mobile number, carrier, desired filename and backuplocation
     
         name = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
         time.sleep(1)
-        mobileNumberCounter = "0"
-        enterNumber = "Y"
-        while enterNumber == "Y" or "y":
+        mobileNumberCounter = 0
+        
+        #declare dictionaries for numbers and carriers
+        collectedNumbers = {}
+        while True:
             mobileNumberCounter = (mobileNumberCounter + 1)
             number = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
             while len(number) != 10:
                 print("\r\n\r\nInvalid input. Your phone number must be exactly 10 digits in length.")
                 time.sleep(2)
                 number =  input("\r\n\r\nPlease enter your 10-digit mobile number: ")
-            number'mobileNumberCounter' = number
             time.sleep(1)
             print("\r\nMobile number recorded as: " + number + (2 * "\r\n"))
         
@@ -96,61 +95,59 @@ def main():
             selection = input("\r\n****\r\n****\r\n\r\nEnter the number corresponding to your mobile carrier above: ")
             if selection =='1':
                 print("Verizon")
-                SMSemailSuffix'mobileNumberCounter' = "vtext.com"
-                carrier'mobileNumberCounter'= "Verizon"
+                collectedNumbers[number] = "Verizon"
             elif selection == '2':
                 print("T-Mobile")
-                SMSemailSuffix'mobileNumberCounter' = "tmomail.net"
-                carrier'mobileNumberCounter' = "T-mobile"
+                collectedNumbers[number] = "T-Mobile"
             elif selection == '3':
                 print("AT&T")
-                SMSemailSuffix'mobileNUmberCounter' = "txt.att.net"
-                carrier'mobileNumberCounter' = "AT&T"
+                collectedNumbers[number] = "AT&T"
             elif selection == '4':
                 print("Sprint")
-                SMSemailSuffix'mobileNumberCounter' = "messaging.sprintpcs.com"
-                carrier'mobileNumberCounter' = "AT&T"
+                collectedNumbers[number] = "Sprint"
             elif selection == '5':
                 print("Boost Mobile")
-                SMSemailSuffix'mobileNumberCounter' = "@myboostmobile.com"
-                carrier'mobileNumberCounter' = "Boost Mobile"
+                collectedNumbers[number] = "Boost Mobile"
             elif selection == '6':
                 print("Cricket")
-                SMSemailSuffix'mobileNumberCounter' = "@sms.mycricket.com"
-                carrier'mobileNumberCounter' = "Cricket"
+                collectedNumbers[number] = "Cricket"
             elif selection == '7':
                 print("Metro PCS")
-                SMSemailSuffix'mobileNumberCounter' == "@mymetropcs.com"
-                carrier'mobileNumberCounter' = "Metro PCS"
+                collectedNumbers[number] = "Metro PCS"
             elif selection == '8':
                 print("Tracfone")
-                SMSemailSuffix'mobileNumberCounter' = "@mmst5.tracfone.com"
-                carrier'mobileNumberCounter' = "Tracfone"
+                collectedNumbers[number] = "Tracfone"
             elif selection == '9':
                 print("US Cellular")
-                SMSemailSuffix'mobileNumberCounter' = "@email.uscc.net"
-                carrier'mobileNumberCounter' = "US Cellular"
+                collectedNumbers[number] = "US Cellular"
             elif selection == '10':
                 print("Virgin Mobile")
-                SMSemailSuffix'mobileNumberCounter' = "@vmobl.com"
-                carrier'mobileNumberCounter' = "Virgin Mobile"
+                collectedNumbers[number] = "Virgin Mobile"
             elif selection == '11':
-                carrier'mobileNumberCounter' = input("\r\n\r\nPlease enter a name for the Carrier: "
-                print("Carrier recorded as : "
-                print(carrier'mobileNumberCounter'
-                SMSemailSuffix'mobileNUmberCounter' = input("\r\nPlease enter the sms email suffix for your mobile carrier (vtext.com, for example): ")
+                otherCarrier = input("\r\n\r\nPlease enter a name for the Carrier: ")
+                print("Carrier recorded as : ")
+                print(otherCarrier)
+                SMSemailSuffix = input("\r\nPlease enter the sms email suffix for your mobile carrier (vtext.com, for example): ")
                 print("\r\n\r\nThe SMS email suffix has been recoded as : ")
-                print(SMSemailSuffix'mobileNumberCounter')
+                print(SMSemailSuffix)
+                collectedNumbers[number] = otherCarrier
+                customSMSemailSuffixes = {}
+                cutomSMSEmailSuffixes[number] = SMSemailSuffix 
                 print(2 * "\r\n")
             else:
                 print (2 * "\r\n", "Unknown Option Selected!", 2 * "\r\n")
-            print("\r\n\r\nYou have entered % number(s).\r" % mobileNumberCounter)
+            print("\r\n\r\nYou have entered %s numbers.\r" % mobileNumberCounter)
             print("\r\n\r\nThe Numbers and carriers are: \r\n\r\n\r\n")
-            for n in range(1,mobileNumberCounter):
-                print(n + ". " + number'n' + " - " + carrier'n' + "\r\n\r\n")
-            enterNumber = input("\r\n\r\nDo you have another mobile number to enter? (Y/N) "
-            while enterNumber != "Y" or "y" or "N" or "n":
-                enterNumber = input("\r\n\r\nInvalid selection.\r\n\r\nDo you have another mobile number to enter? (Y/N) "
+            print(collectedNumbers)
+            anotherNumber = input("\r\n\r\nDo you have another mobile number to enter? (Y/N) ")
+            if anotherNumber in ["Y","y","N","n"]:
+                if anotherNumber in ["Y","y"]:
+                    pass
+                else: 
+                    break
+            else: 
+                break
+
 
         time.sleep(2)
         infile_name = input("\r\n\r\nPlease give the absolute path of the backup file (.xml file): ")
@@ -199,50 +196,44 @@ def main():
                 #For now we will rely on the contact anme in the backup file, but in the future 
                 #we will run the numbers against Google Contacts to retrieve the updated information
                 
-                if i.getAttribute("contact_name") != "(Unknown)":
-                    googleContactName = i.getAttribute("contact_name")
-                else:
+                if i.getAttribute("contact_name") in ["(Unknown)","unknown","Unknown"]:
                     googleContactName = "Unknown"
+                else:
+                    googleContactName = i.getAttribute("contact_name")
                 
                 #format the phone number into something we can work with
                 
                 rawNumber = i.getAttribute("address")
-                                
+                strippedaNumber = rawNumber.strip('+1')
+                
                 #Lookup the mobile carrier for that number and declare the correct SMS email address based the returned carrier
                 
-                if (len(rawNumber) != 5) and (len(rawNumber) != 8):
-                    parsedNumber = phonenumbers.parse(rawNumber, "US")
-                    formattedNumber = phonenumbers.format_number(parsedNumber, phonenumbers.PhoneNumberFormat.NATIONAL)
-                    elevenDigitNumber = formattedNumber[1:]
-                
-                else:
-                    mobileCarrier = "unknown"
-                    
+                mobileCarrier = "unknown"
 
                 if "Verizon" in mobileCarrier:
-                    SMSemailAddress = (elevenDigitNumber + "@vtext.com")
+                    SMSemailAddress = (strippedNumber + "@vtext.com")
                 elif "T-Mobile" in mobileCarrier:
-                    SMSemailAddress = (elevenDigitNumber + "@tmomail.net")
+                    SMSemailAddress = (strippedNumber + "@tmomail.net")
                 elif "AT&T" in mobileCarrier:
-                    SMSemailAddress = (elevenDigitNumber + "@txt.att.net")
+                    SMSemailAddress = (strippedNumber + "@txt.att.net")
                 elif "Sprint" in mobileCarrier:            
-                    SMSemailAddress = (elevenDigitNumber + "@messaging.sprintpcs.com")
+                    SMSemailAddress = (strippedNumber + "@messaging.sprintpcs.com")
                 elif "Boost" in mobileCarrier:
-                    SMSemailAddress = (elevenDigitNumber + "@myboostmobile.com")
+                    SMSemailAddress = (strippedNumber + "@myboostmobile.com")
                 elif "cket" in mobileCarrier:
                     SMSemailAddress = (formatteedNumber + "@sms.mycricket.com")
                 elif "Metro" in mobileCarrier:
-                    SMSemailAddress = (elevenDigitNumber + "@mymetropcs.com")
+                    SMSemailAddress = (strippedNumber + "@mymetropcs.com")
                 elif "Trac" in mobileCarrier:
-                    SMSemailAddress = (elevenDigitNumber + "@mmst5.tracfone.com")
+                    SMSemailAddress = (strippedNumber + "@mmst5.tracfone.com")
                 elif "US" in mobileCarrier:
-                    SMSemailAddress = (elevenDigitNumber +"@email.uscc.net")
+                    SMSemailAddress = (strippedNumber +"@email.uscc.net")
                 elif "Virgin" in mobileCarrier:
-                    SMSemailAddress = (elevenDigitNumber + "@vmobl.com")
+                    SMSemailAddress = (strippedNumber + "@vmobl.com")
                 elif mobileCarrier == "unknown":
-                    SMSemailAddress = (rawNumber + "@unknown-carrier.net")
+                    SMSemailAddress = (strippedNumber + "@unknown-carrier.net")
                 else:
-                    SMSemailAddress = (elevenDigitNumber + "@unknown-carrier.net")
+                    SMSemailAddress = (strippedNumber + "@unknown-carrier.net")
                
                 #write out the email data now that things are parsed, looked-up, formatted and ready
                
@@ -256,11 +247,36 @@ def main():
                     file.write("Message-ID: ")
                     file.write(message_id + "\r\n")
                     file.write("From: ")
-                    if i.getAttribute("type") == 1:
-                            file.write(googleContactName +" <" + SMSemailAddress + ">" + "\r\nTo: " + name + " <" + number  + "@" + SMSemailSuffix + ">\r\n"
+                    
+                    if strippedNumber in collectedNumbers:
+                        if collectedNumbers[strippedNumber] == "Verizon":
+                            SMSemailSuffix = "@vtext.com"
+                        elif collectedNumbers[strippedNumber] == "T-Mobile":
+                            SMSemailSuffix = "tmomail.net"
+                        elif collectedNumbers[strippedNumber] == "AT&T":
+                            SMSemailSuffix = "txt.att.net"
+                        elif collectedNumbers[strippedNumber] == "Sprint":            
+                            SMSemailSuffix = "messaging.sprintpcs.com"
+                        elif collectedNumbers[strippedNumber] == "Boost Mobile":
+                            SMSemailSuffix = "myboostmobile.com"
+                        elif collectedNumbers[strippedNumber] == "Cricket":
+                            SMSemailSuffix = "sms.mycricket.com"
+                        elif collectedNumbers[strippedNumber] == "Metro PCS":
+                            SMSemailSuffix = "mymetropcs.com"
+                        elif collectedNumbers[strippedNumber] == "Tracfone":
+                            SMSemailSuffix = "mmst5.tracfone.com"
+                        elif collectedNumbers[strippedNumber] == "US Cellular":
+                            SMSemailSuffix = "email.uscc.net"
+                        elif collectedNumbers[strippedNumber] == "Virgin Mobile":
+                            SMSemailSuffix = "vmobl.com"
+                        elif collectedNumbers[strippedNumber] == "Other":
+                            pass
+                        else:
+                            SMSemailSuffix = "unknown-carrier.net" 
+                        file.write(googleContactName +" <" + SMSemailAddress + ">" + "\r\nTo: " + name + " <" + strippedNumber  + "@" + SMSemailSuffix + ">\r\n"
 )
                     else:
-                            file.write(name + " <" + number + "@" + SMSemailSuffix + ">\r\nTo: " + googleContactName + " <" + SMSemailAddress + ">\r\n")
+                            file.write(name + " <" + strippedNumber + "@" + SMSemailSuffix + ">\r\nTo: " + googleContactName + " <" + SMSemailAddress + ">\r\n")
                     file.write("Subject: [SMS] ")
                     file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
                     file.write(i.getAttribute("body"))
@@ -282,10 +298,10 @@ def main():
                         addEMLtoMbox(file, dest_mbox)
                         file.close()
                         dest_mbox.unlock()
-                smscounter = (smscounter + 1)
-                #stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
+                    smscounter = (smscounter + 1)
+                    stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
             print(2 * "\r\n")       
-            #stdout.flush();
+            stdout.flush();
             print("************************************\r\n***********************************\r\nProcessing of the SMS backup file is complete. Find the eml files in the sms directory or they are all included in the mbox file just created with the name of your choosing.") 
             return 0
 
