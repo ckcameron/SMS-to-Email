@@ -123,7 +123,7 @@ def main():
             print (2 * "\r\n", "Unknown Option Selected!", 2 * "\r\n")
         time.sleep(2)
         infile_name = input("\r\n\r\nPlease give the absolute path of the backup file (.xml file): ")
-        dest_name = (input("\r\n\r\nPlease provide a name for the mailbox you would like to create (the .mbox atr the end of the filename will be added for you): ") + ".mbox")
+        dest_name = (input("\r\n\r\nPlease provide a name for the mailbox you would like to create (the .mbox at the end of the filename will be added for you): ") + ".mbox")
         smspath = "sms"
         script_dir = os.path.dirname(__file__)
         time.sleep(1)
@@ -183,7 +183,7 @@ def main():
                     parsedNumber = phonenumbers.parse(rawNumber, "US")
                     formattedNumber = phonenumbers.format_number(parsedNumber, phonenumbers.PhoneNumberFormat.NATIONAL)
                     elevenDigitNumber = formattedNumber[1:]
-                    mobileCarrier = carrier.name_for_number(elevenDigitNumber, "en")
+                    mobileCarrier = carrier.name_for_number(parsedNumber, "en")
                     print(mobileCarrier)
                 
                 else:
@@ -191,29 +191,29 @@ def main():
                     
 
                 if "Verizon" in mobileCarrier:
-                    SMSemailAddress = (formattedNumber + "@vtext.com")
+                    SMSemailAddress = (elevenDigitNumber + "@vtext.com")
                 elif "T-Mobile" in mobileCarrier:
-                    SMSemailAddress = (formattedNumber + "@tmomail.net")
+                    SMSemailAddress = (elevenDigitNumber + "@tmomail.net")
                 elif "AT&T" in mobileCarrier:
-                    SMSemailAddress = (formattedNumber + "@txt.att.net")
+                    SMSemailAddress = (elevenDigitNumber + "@txt.att.net")
                 elif "Sprint" in mobileCarrier:            
-                    SMSemailAddress = (formattedNumber + "@messaging.sprintpcs.com")
+                    SMSemailAddress = (elevenDigitNumber + "@messaging.sprintpcs.com")
                 elif "Boost" in mobileCarrier:
-                    SMSemailAddress = (formattedNumber + "@myboostmobile.com")
+                    SMSemailAddress = (elevenDigitNumber + "@myboostmobile.com")
                 elif "cket" in mobileCarrier:
                     SMSemailAddress = (formatteedNumber + "@sms.mycricket.com")
                 elif "Metro" in mobileCarrier:
-                    SMSemailAddress = (formattedNumber + "@mymetropcs.com")
+                    SMSemailAddress = (elevenDigitNumber + "@mymetropcs.com")
                 elif "Trac" in mobileCarrier:
-                    SMSemailAddress = (formattedNumber + "@mmst5.tracfone.com")
+                    SMSemailAddress = (elevenDigitNumber + "@mmst5.tracfone.com")
                 elif "US" in mobileCarrier:
-                    SMSemailAddress = (formattedNumber +"@email.uscc.net")
+                    SMSemailAddress = (elevenDigitNumber +"@email.uscc.net")
                 elif "Virgin" in mobileCarrier:
-                    SMSemailAddress = (formattedNumber + "@vmobl.com")
+                    SMSemailAddress = (elevenDigitNumber + "@vmobl.com")
                 elif mobileCarrier == "unknown":
                     SMSemailAddress = (rawNumber + "@unknown-carrier.net")
                 else:
-                    SMSemailAddress = (formattedNumber + "@unknown-carrier.net")
+                    SMSemailAddress = (elevenDigitNumber + "@unknown-carrier.net")
                
                 #write out the email data now that things are parsed, looked-up, formatted and ready
                
@@ -265,8 +265,8 @@ def main():
                         
     #handle exceptions and cleanup
     except Exception:
-        lockfile = os.path.join(script_dir, dest_name + ".lock*")
-        mboxfile = os.path.join(script_dir, dest_file)
+        lockfile = os.path.join(script_dir, dest_mbox + ".lock*")
+        mboxfile = os.path.join(script_dir, dest_mbox)
         if os.path.exists(lockfile) and os.path.exists(mboxfile):
             os.remove(lockfile)
             os.remove(mboxfile)
