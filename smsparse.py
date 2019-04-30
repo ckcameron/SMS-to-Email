@@ -57,6 +57,10 @@ def main():
         name = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
         time.sleep(1)
         number = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
+        while len(number) != 10:
+            print("\r\n\r\nInvalid input. Your phone number must be exactly 10 digits in length.")
+            time.sleep(2)
+            input("\r\n\r\nPlease enter your 10-digit mobile number: ")
         time.sleep(1)
         print("\r\nMobile number recorded as: " + number + (2 * "\r\n"))
         
