@@ -29,6 +29,7 @@ import phonenumbers
 from phonenumbers import carrier
 import mobile_codes
 import trunofficial
+import requests
 
 global debug
 debug = True
@@ -183,8 +184,6 @@ def main():
                     parsedNumber = phonenumbers.parse(rawNumber, "US")
                     formattedNumber = phonenumbers.format_number(parsedNumber, phonenumbers.PhoneNumberFormat.NATIONAL)
                     elevenDigitNumber = formattedNumber[1:]
-                    mobileCarrier = carrier.name_for_number(parsedNumber, "en")
-                    print(mobileCarrier)
                 
                 else:
                     mobileCarrier = "unknown"
@@ -265,8 +264,8 @@ def main():
                         
     #handle exceptions and cleanup
     except Exception:
-        lockfile = os.path.join(script_dir, dest_mbox + ".lock*")
-        mboxfile = os.path.join(script_dir, dest_mbox)
+        lockfile = os.path.join(script_dir, dest_name + ".lock*")
+        mboxfile = os.path.join(script_dir, dest_name)
         if os.path.exists(lockfile) and os.path.exists(mboxfile):
             os.remove(lockfile)
             os.remove(mboxfile)
