@@ -56,76 +56,102 @@ def main():
     
         name = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
         time.sleep(1)
-        number = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
-        while len(number) != 10:
-            print("\r\n\r\nInvalid input. Your phone number must be exactly 10 digits in length.")
-            time.sleep(2)
-            input("\r\n\r\nPlease enter your 10-digit mobile number: ")
-        time.sleep(1)
-        print("\r\nMobile number recorded as: " + number + (2 * "\r\n"))
+        mobileNumberCounter = "0"
+        enterNumber = "Y"
+        while enterNumber == "Y" or "y":
+            mobileNumberCounter = (mobileNumberCounter + 1)
+            number = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
+            while len(number) != 10:
+                print("\r\n\r\nInvalid input. Your phone number must be exactly 10 digits in length.")
+                time.sleep(2)
+                number =  input("\r\n\r\nPlease enter your 10-digit mobile number: ")
+            number'mobileNumberCounter' = number
+            time.sleep(1)
+            print("\r\nMobile number recorded as: " + number + (2 * "\r\n"))
         
-        #This feature awaits API approval from Google
-        #gacount = input("Please enter the Google account you wish to retrieve your contacts from: ")
+            #This feature awaits API approval from Google
+            #gacount = input("Please enter the Google account you wish to retrieve your contacts from: ")
         
-        #a menu for selecting the mobile carrier (US Specific)
+            #a menu for selecting the mobile carrier (US Specific)
 
-        def menu():
-            print(30 * "-", "MOBILE CARRIER" , 30 * "-")
-            print("1.  Verizon")
-            print("2.  T-Mobile")
-            print("3.  AT&T")
-            print("4.  Sprint")
-            print("5.  Boost Mobile")
-            print("6.  Cricket")
-            print("7.  Metro PCS")
-            print("8.  Tracfone")
-            print("9.  US Cellular")
-            print("10. Virgin Mobile")
-            print("11. Other")
-        time.sleep(2)
-        menu()
-        time.sleep(2)
+            def menu():
+                print(30 * "-", "MOBILE CARRIER" , 30 * "-")
+                print("1.  Verizon")
+                print("2.  T-Mobile")
+                print("3.  AT&T")
+                print("4.  Sprint")
+                print("5.  Boost Mobile")
+                print("6.  Cricket")
+                print("7.  Metro PCS")
+                print("8.  Tracfone")
+                print("9.  US Cellular")
+                print("10. Virgin Mobile")
+                print("11. Other")
+            time.sleep(2)
+            menu()
+            time.sleep(1)
         
-        # declare the approprite SMS email suffix based on carrier
+            # declare the approprite SMS email suffix based on carrier
         
-        selection = input("\r\n****\r\n****\r\n\r\nEnter the number corresponding to your mobile carrier above: ")
-        if selection =='1':
-            print("Verizon")
-            SMSemailSuffix = "vtext.com"
-        elif selection == '2':
-            print("T-Mobile")
-            SMSemailSuffix = "tmomail.net"
-        elif selection == '3':
-            print("AT&T")
-            SMSemailSuffix = "txt.att.net"
-        elif selection == '4':
-            print("Sprint")
-            SMSemailSuffix = "messaging.sprintpcs.com"
-        elif selection == '5':
-            print("Boost Mobile")
-            SMSemailSuffix = "@myboostmobile.com"
-        elif selection == '6':
-            print("Cricket")
-            SMSemailSuffix = "@sms.mycricket.com"
-        elif selection == '7':
-            print("Metro PCS")
-            SMSemailSuffix == "@mymetropcs.com"
-        elif selection == '8':
-            print("Tracfone")
-            SMSemailSuffix = "@mmst5.tracfone.com"
-        elif selection == '9':
-            print("US Cellular")
-            SMSemailSuffix = "@email.uscc.net"
-        elif selection == '10':
-            print("Virgin Mobile")
-            SMSemailSuffix = "@vmobl.com"
-        elif selection == '11':
-            SMSemailSuffix = input("\r\nPlease enter the sms email suffix for your mobile carrier (vtext.com, for example): ")
-            print("\r\nThe SMS email suffix has been recoded as : ")
-            print(SMSemailSuffix)
-            print(2 * "\r\n")
-        else:
-            print (2 * "\r\n", "Unknown Option Selected!", 2 * "\r\n")
+            selection = input("\r\n****\r\n****\r\n\r\nEnter the number corresponding to your mobile carrier above: ")
+            if selection =='1':
+                print("Verizon")
+                SMSemailSuffix'mobileNumberCounter' = "vtext.com"
+                carrier'mobileNumberCounter'= "Verizon"
+            elif selection == '2':
+                print("T-Mobile")
+                SMSemailSuffix'mobileNumberCounter' = "tmomail.net"
+                carrier'mobileNumberCounter' = "T-mobile"
+            elif selection == '3':
+                print("AT&T")
+                SMSemailSuffix'mobileNUmberCounter' = "txt.att.net"
+                carrier'mobileNumberCounter' = "AT&T"
+            elif selection == '4':
+                print("Sprint")
+                SMSemailSuffix'mobileNumberCounter' = "messaging.sprintpcs.com"
+                carrier'mobileNumberCounter' = "AT&T"
+            elif selection == '5':
+                print("Boost Mobile")
+                SMSemailSuffix'mobileNumberCounter' = "@myboostmobile.com"
+                carrier'mobileNumberCounter' = "Boost Mobile"
+            elif selection == '6':
+                print("Cricket")
+                SMSemailSuffix'mobileNumberCounter' = "@sms.mycricket.com"
+                carrier'mobileNumberCounter' = "Cricket"
+            elif selection == '7':
+                print("Metro PCS")
+                SMSemailSuffix'mobileNumberCounter' == "@mymetropcs.com"
+                carrier'mobileNumberCounter' = "Metro PCS"
+            elif selection == '8':
+                print("Tracfone")
+                SMSemailSuffix'mobileNumberCounter' = "@mmst5.tracfone.com"
+                carrier'mobileNumberCounter' = "Tracfone"
+            elif selection == '9':
+                print("US Cellular")
+                SMSemailSuffix'mobileNumberCounter' = "@email.uscc.net"
+                carrier'mobileNumberCounter' = "US Cellular"
+            elif selection == '10':
+                print("Virgin Mobile")
+                SMSemailSuffix'mobileNumberCounter' = "@vmobl.com"
+                carrier'mobileNumberCounter' = "Virgin Mobile"
+            elif selection == '11':
+                carrier'mobileNumberCounter' = input("\r\n\r\nPlease enter a name for the Carrier: "
+                print("Carrier recorded as : "
+                print(carrier'mobileNumberCounter'
+                SMSemailSuffix'mobileNUmberCounter' = input("\r\nPlease enter the sms email suffix for your mobile carrier (vtext.com, for example): ")
+                print("\r\n\r\nThe SMS email suffix has been recoded as : ")
+                print(SMSemailSuffix'mobileNumberCounter')
+                print(2 * "\r\n")
+            else:
+                print (2 * "\r\n", "Unknown Option Selected!", 2 * "\r\n")
+            print("\r\n\r\nYou have entered % number(s).\r" % mobileNumberCounter)
+            print("\r\n\r\nThe Numbers and carriers are: \r\n\r\n\r\n")
+            for n in range(1,mobileNumberCounter):
+                print(n + ". " + number'n' + " - " + carrier'n' + "\r\n\r\n")
+            enterNumber = input("\r\n\r\nDo you have another mobile number to enter? (Y/N) "
+            while enterNumber != "Y" or "y" or "N" or "n":
+                enterNumber = input("\r\n\r\nInvalid selection.\r\n\r\nDo you have another mobile number to enter? (Y/N) "
+
         time.sleep(2)
         infile_name = input("\r\n\r\nPlease give the absolute path of the backup file (.xml file): ")
         dest_name = (input("\r\n\r\nPlease provide a name for the mailbox you would like to create (the .mbox at the end of the filename will be added for you): ") + ".mbox")
