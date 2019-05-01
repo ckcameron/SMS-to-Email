@@ -25,11 +25,11 @@ import unicodedata
 #import gdata.data
 #import gdata.contacts.client
 ##import gdata.contacts.data
-import phonenumbers
-from phonenumbers import carrier
-import mobile_codes
-import trunofficial
-import requests
+#import phonenumbers
+#from phonenumbers import carrier
+#import mobile_codes
+#import trunofficial
+#import requests
 
 global debug
 debug = True
