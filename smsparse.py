@@ -169,141 +169,145 @@ def main():
             time.sleep(5)
             print((3 * "\r\n") + "Hold on, this could take a while, depending on the number of messages being processed." + (2 * "\r\n"))
     
-            #parse the backup file by XML tag atttribute
+        #parse the backup file by XML tag atttribute
     
-            doc = minidom.parse(infile_name)
-            sms = doc.getElementsByTagName("sms") 
+        doc = minidom.parse(infile_name)
+        sms = doc.getElementsByTagName("sms") 
             
-            #initialize the counters
+        #initialize the counters
 
-            smscounter = 0
-            mboxcounter = 0
+        smscounter = 0
+        mboxcounter = 0
             
-            #declare/create the mbox
+        #declare/create the mbox
     
-            dest_mbox = mailbox.mbox(dest_name, create=True)
+        dest_mbox = mailbox.mbox(dest_name, create=True)
             
-            # loop through the messages and process them
+        # loop through the messages and process them
             
-            for i in sms:
+        for i in sms:
                 
-                #file related OS variables
+            #file related OS variables
                 
-                filename = (i.getAttribute("contact_name") + " " + i.getAttribute("readable_date") + ".eml")
-                rel_path = "sms/"
-                filepath = os.path.join(script_dir, rel_path, filename)
+            filename = (i.getAttribute("contact_name") + " " + i.getAttribute("readable_date") + ".eml")
+            rel_path = "sms/"
+            filepath = os.path.join(script_dir, rel_path, filename)
                 
-                #For now we will rely on the contact anme in the backup file, but in the future 
-                #we will run the numbers against Google Contacts to retrieve the updated information
+            #For now we will rely on the contact anme in the backup file, but in the future 
+            #we will run the numbers against Google Contacts to retrieve the updated information
                 
-                if i.getAttribute("contact_name") in ["(Unknown)","unknown","Unknown"]:
+            if i.getAttribute("contact_name") in ["(Unknown)","unknown","Unknown"]:
                     googleContactName = "Unknown"
-                else:
-                    googleContactName = i.getAttribute("contact_name")
+            else:
+                googleContactName = i.getAttribute("contact_name")
                 
-                #format the phone number into something we can work with
+            #format the phone number into something we can work with
                 
-                rawNumber = i.getAttribute("address")
-                strippedaNumber = rawNumber.strip('+1')
+            rawNumber = i.getAttribute("address")
+            if "+" in rawNumber:
+                strippedNumber = rawNumber.strip('+1')
+            else:
+                strippedNumber = rawNumber
                 
                 #Lookup the mobile carrier for that number and declare the correct SMS email address based the returned carrier
-                
-                mobileCarrier = "unknown"
+                #For now I cannot find a free way to do this, so I putting the feature on hold.
 
-                if "Verizon" in mobileCarrier:
+            mobileCarrier = "unknown"
+
+            if "Verizon" in mobileCarrier:
                     SMSemailAddress = (strippedNumber + "@vtext.com")
-                elif "T-Mobile" in mobileCarrier:
+            elif "T-Mobile" in mobileCarrier:
                     SMSemailAddress = (strippedNumber + "@tmomail.net")
-                elif "AT&T" in mobileCarrier:
+            elif "AT&T" in mobileCarrier:
                     SMSemailAddress = (strippedNumber + "@txt.att.net")
-                elif "Sprint" in mobileCarrier:            
+            elif "Sprint" in mobileCarrier:            
                     SMSemailAddress = (strippedNumber + "@messaging.sprintpcs.com")
-                elif "Boost" in mobileCarrier:
+            elif "Boost" in mobileCarrier:
                     SMSemailAddress = (strippedNumber + "@myboostmobile.com")
-                elif "cket" in mobileCarrier:
+            elif "cket" in mobileCarrier:
                     SMSemailAddress = (formatteedNumber + "@sms.mycricket.com")
-                elif "Metro" in mobileCarrier:
+            elif "Metro" in mobileCarrier:
                     SMSemailAddress = (strippedNumber + "@mymetropcs.com")
-                elif "Trac" in mobileCarrier:
+            elif "Trac" in mobileCarrier:
                     SMSemailAddress = (strippedNumber + "@mmst5.tracfone.com")
-                elif "US" in mobileCarrier:
+            elif "US" in mobileCarrier:
                     SMSemailAddress = (strippedNumber +"@email.uscc.net")
-                elif "Virgin" in mobileCarrier:
+            elif "Virgin" in mobileCarrier:
                     SMSemailAddress = (strippedNumber + "@vmobl.com")
-                elif mobileCarrier == "unknown":
+            elif mobileCarrier == "unknown":
                     SMSemailAddress = (strippedNumber + "@unknown-carrier.net")
-                else:
+            else:
                     SMSemailAddress = (strippedNumber + "@unknown-carrier.net")
                
-                #write out the email data now that things are parsed, looked-up, formatted and ready
+            #write out the email data now that things are parsed, looked-up, formatted and ready
                
-                with open(filepath, "w+") as file:
-                    file.write("Date: ")
-                    rawdate = utils.parsedate_to_datetime(i.getAttribute("readable_date"))
-                    message_date = utils.format_datetime(rawdate) 
-                    file.write(message_date)
-                    file.write("\r\n")
-                    message_id = utils.make_msgid(idstring=None, domain="sms.smsparse-py.net")
-                    file.write("Message-ID: ")
-                    file.write(message_id + "\r\n")
-                    file.write("From: ")
+            with open(filepath, "w+") as file:
+                file.write("Date: ")
+                rawdate = utils.parsedate_to_datetime(i.getAttribute("readable_date"))
+                message_date = utils.format_datetime(rawdate) 
+                file.write(message_date)
+                file.write("\r\n")
+                message_id = utils.make_msgid(idstring=None, domain="sms.smsparse-py.net")
+                file.write("Message-ID: ")
+                file.write(message_id + "\r\n")
+                file.write("From: ")
                     
-                    if strippedNumber in collectedNumbers:
-                        if collectedNumbers[strippedNumber] == "Verizon":
-                            SMSemailSuffix = "@vtext.com"
-                        elif collectedNumbers[strippedNumber] == "T-Mobile":
-                            SMSemailSuffix = "tmomail.net"
-                        elif collectedNumbers[strippedNumber] == "AT&T":
-                            SMSemailSuffix = "txt.att.net"
-                        elif collectedNumbers[strippedNumber] == "Sprint":            
-                            SMSemailSuffix = "messaging.sprintpcs.com"
-                        elif collectedNumbers[strippedNumber] == "Boost Mobile":
-                            SMSemailSuffix = "myboostmobile.com"
-                        elif collectedNumbers[strippedNumber] == "Cricket":
-                            SMSemailSuffix = "sms.mycricket.com"
-                        elif collectedNumbers[strippedNumber] == "Metro PCS":
-                            SMSemailSuffix = "mymetropcs.com"
-                        elif collectedNumbers[strippedNumber] == "Tracfone":
-                            SMSemailSuffix = "mmst5.tracfone.com"
-                        elif collectedNumbers[strippedNumber] == "US Cellular":
-                            SMSemailSuffix = "email.uscc.net"
-                        elif collectedNumbers[strippedNumber] == "Virgin Mobile":
-                            SMSemailSuffix = "vmobl.com"
-                        elif collectedNumbers[strippedNumber] == "Other":
-                            pass
-                        else:
-                            SMSemailSuffix = "unknown-carrier.net" 
-                        file.write(googleContactName +" <" + SMSemailAddress + ">" + "\r\nTo: " + name + " <" + strippedNumber  + "@" + SMSemailSuffix + ">\r\n"
-)
+                if strippedNumber in collectedNumbers:
+                    if collectedNumbers[strippedNumber] == "Verizon":
+                        SMSemailSuffix = "@vtext.com"
+                    elif collectedNumbers[strippedNumber] == "T-Mobile":
+                        SMSemailSuffix = "tmomail.net"
+                    elif collectedNumbers[strippedNumber] == "AT&T":
+                        SMSemailSuffix = "txt.att.net"
+                    elif collectedNumbers[strippedNumber] == "Sprint":            
+                        SMSemailSuffix = "messaging.sprintpcs.com"
+                    elif collectedNumbers[strippedNumber] == "Boost Mobile":
+                        SMSemailSuffix = "myboostmobile.com"
+                    elif collectedNumbers[strippedNumber] == "Cricket":
+                        SMSemailSuffix = "sms.mycricket.com"
+                    elif collectedNumbers[strippedNumber] == "Metro PCS":
+                        SMSemailSuffix = "mymetropcs.com"
+                    elif collectedNumbers[strippedNumber] == "Tracfone":
+                        SMSemailSuffix = "mmst5.tracfone.com"
+                    elif collectedNumbers[strippedNumber] == "US Cellular":
+                        SMSemailSuffix = "email.uscc.net"
+                    elif collectedNumbers[strippedNumber] == "Virgin Mobile":
+                        SMSemailSuffix = "vmobl.com"
+                    elif collectedNumbers[strippedNumber] == "Other":
+                        pass
                     else:
-                            file.write(name + " <" + strippedNumber + "@" + SMSemailSuffix + ">\r\nTo: " + googleContactName + " <" + SMSemailAddress + ">\r\n")
-                    file.write("Subject: [SMS] ")
-                    file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
-                    file.write(i.getAttribute("body"))
-                    file.close()
+                        SMSemailSuffix = "unknown-carrier.net" 
+                    file.write(googleContactName +" <" + SMSemailAddress + ">" + "\r\nTo: " + name + " <" + strippedNumber  + "@" + SMSemailSuffix + ">\r\n")
+
+                else:
+                    file.write(name + " <" + strippedNumber + "@" + SMSemailSuffix + ">\r\nTo: " + googleContactName + " <" + SMSemailAddress + ">\r\n")
+                file.write("Subject: [SMS] ")
+                file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
+                file.write(i.getAttribute("body"))
+                file.close()
                     
                     #define a function and a try loop for adding the eml files to the mbox file
 
-                    def addEMLtoMbox(file, dest_mbox):
-                                try:
-                                    dest_mbox.add(file)
-                                except:
-                                    dest_mbox.close()
-                                    raise
+                def addEMLtoMbox(file, dest_mbox):
+                    try:
+                        dest_mbox.add(file)
+                    except:
+                        dest_mbox.close()
+                        raise
 
-                    #reopen the file and add it to the mbox now that it is complete
+                #reopen the file and add it to the mbox now that it is complete
 
-                    with open(filepath, "rb") as file:
-                        dest_mbox.lock()
-                        addEMLtoMbox(file, dest_mbox)
-                        file.close()
-                        dest_mbox.unlock()
+                with open(filepath, "rb") as file:
+                    dest_mbox.lock()
+                    addEMLtoMbox(file, dest_mbox)
+                    file.close()
+                    dest_mbox.unlock()
                     smscounter = (smscounter + 1)
-                    stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
-            print(2 * "\r\n")       
-            stdout.flush();
-            print("************************************\r\n***********************************\r\nProcessing of the SMS backup file is complete. Find the eml files in the sms directory or they are all included in the mbox file just created with the name of your choosing.") 
-            return 0
+                stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
+        print(2 * "\r\n")       
+        stdout.flush();
+        print("************************************\r\n***********************************\r\nProcessing of the SMS backup file is complete. Find the eml files in the sms directory or they are all included in the mbox file just created with the name of your choosing.") 
+        return 0
 
                             
     
