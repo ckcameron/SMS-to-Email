@@ -213,9 +213,9 @@ def main():
             
         print((3 * "\r\n") + "Great. The script has sucessfully processed your Google Contacts for the needed data.\r\n\r\n...Now the real work begins. The script will now parse your sms backupfile, match the necessary data, write the email headers and create the mbox file.")
         time.sleep(2)
-        print("\r\n\r\nIt slices.")
+        print("\r\n\r\nIt slices...")
         time.sleep(1)
-        print("\r\n\r\nIt dices."
+        print("\r\n\r\nIt dices...")
         time.sleep(1)
         print("\r\n\r\nIt circumcises...")
         time.sleep(1)
