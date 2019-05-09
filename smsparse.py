@@ -38,7 +38,6 @@ debug = True
 
 def main():
 
-    try:        
         #Print basic inforamtion about the script
     
         print ("This script will parse an XML file and output a .mbox file in the current directory\r\n and a directory named sms both containing all of the messages found in the XML file.", 2 * "\r\n")
@@ -51,6 +50,7 @@ def main():
         name = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
         time.sleep(1)
         mobileNumberCounter = 0
+        
         
         #declare dictionaries for numbers and carriers
         collectedNumbers = {}
@@ -197,23 +197,20 @@ def main():
         print("...")
         time.sleep(2)
         print("...")
-        #declare a dict to stick contact data in
-
-        googleContacts = {}
             
         for person in connections:
             names = person.get('names', [])
             if names:
                 name = names[0].get('displayName')
-                contactNumbers =  person.get('phoneNumbers',[])
-                for number in contactNumbers:
-                    googleContacts[name] = jsonReply 
-                    jsonNumberReturn = json.loads(googleContacts[jsonReply])
-                    for listing in jsonNumberReturn:
-                        canonicalNumber = jsonNumberReturn['listing'][0]['canonicalForm']
-                        parsedGoogleContacts = {}
-                        parsedGoogleContacts[name] = canonicalNumber
-                        print(parsedGoogleContacts[name])
+                print(name) 
+            contactNumbers =  person.get('phoneNumbers',[])
+            for number in contactNumbers: 
+                jsonReturn = json.dumps(contactNumbers)
+                jsonLoaded = json.loads(jsonReturn)
+                canonicalNumber = jsonLoaded[0].get('canonicalForm')
+                parsedGoogleContacts = {}
+                parsedGoogleContacts[name] = canonicalNumber
+                print(parsedGoogleContacts[name])
             
 
             
@@ -259,11 +256,10 @@ def main():
             else:
                 strippedNumber = rawNumber
                 
-            if strippedNumber in googleContacts:
-                gContactName = googleContacts(strippedNumber)
+            if strippedNumber in parsedGoogleContacts:
+                gContactName = parsedGoogleContacts[canonicalNumber]
             else:
                 gContactName = "Unknown"
-
 
 
             #Lookup the mobile carrier for that number and declare the correct SMS email address based the returned carrier
@@ -334,9 +330,10 @@ def main():
                         pass
                     else:
                         SMSemailSuffix = "unknown-carrier.net" 
-                        file.write(gContactName +" <" + SMSemailAddress + ">" + "\r\nTo: " + name + " <" + strippedNumber  + "@" + SMSemailSuffix + ">\r\n")
+                    file.write(gContactName +" <" + SMSemailAddress + ">" + "\r\nTo: " + name + " <" + strippedNumber  + "@" + SMSemailSuffix + ">\r\n")
 
                 else:
+                    SMSemailSuffix = "unknown-carrier.net"
                     file.write(name + " <" + strippedNumber + "@" + SMSemailSuffix + ">\r\nTo: " + gContactName + " <" + SMSemailAddress + ">\r\n")
                     file.write("Subject: [SMS] ")
                     file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
@@ -346,37 +343,19 @@ def main():
                     #reopen the file and add it to the mbox now that it is complete
 
                     with open(filepath, "rb") as file:
-                        addEMLtoMbox(file, dest_mbox)
-                        file.close()
+                        dest_mbox.lock()
+                        dest_mbox.add(file)
                         dest_mbox.flush()
+                        dest_mbox.unlock()
+                        file.close()
                         smscounter = (smscounter + 1)
-                dest_mbox.close()
-                stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
+                        stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
         stdout.flush();
         print(2 * "\r\n")       
             
         print("************************************\r\n***********************************\r\nProcessing of the SMS backup file is complete. Find the eml files in the sms directory or they are all included in the mbox file just created with the name of your choosing.") 
-        return 0
-
+    
+main()
                             
     
                         
-    #handle exceptions and cleanup
-    except Exception:
-        lockfile = os.path.join(script_dir, dest_name + ".lock*")
-        mboxfile = os.path.join(script_dir, dest_name)
-        if os.path.exists(lockfile) and os.path.exists(mboxfile):
-            os.remove(lockfile)
-            os.remove(mboxfile)
-            shutil.rmtree(smspath)
-            return 1
-        elif os.path.exists(mboxfile):
-            os.remove(mboxfile)
-            shutil.rmtree(smspath)
-            return 1
-        else:
-            shutil.rmtree(smspath)
-            return 1
-
-if __name__ == '__main__':
-    sys.exit(main())
