@@ -47,7 +47,7 @@ def main():
 
         #gather user input for name, mobile number, carrier, desired filename and backuplocation
     
-        name = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
+        myname = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
         time.sleep(1)
         mobileNumberCounter = 0
         
@@ -56,13 +56,13 @@ def main():
         collectedNumbers = {}
         while True:
             mobileNumberCounter = (mobileNumberCounter + 1)
-            number = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
-            while len(number) != 10:
+            mynumber = input("\r\n\r\nPlease enter your 10-digit mobile number: ")
+            while len(mynumber) != 10:
                 print("\r\n\r\nInvalid input. Your phone number must be exactly 10 digits in length.")
                 time.sleep(2)
-                number =  input("\r\n\r\nPlease enter your 10-digit mobile number: ")
+                mynumber =  input("\r\n\r\nPlease enter your 10-digit mobile number: ")
             time.sleep(1)
-            print("\r\nMobile number recorded as: " + number + (2 * "\r\n"))
+            print("\r\nMobile number recorded as: " + mynumber + (2 * "\r\n"))
         
            
             #a menu for selecting the mobile carrier (US Specific)
@@ -89,34 +89,34 @@ def main():
             selection = input("\r\n****\r\n****\r\n\r\nEnter the number corresponding to your mobile carrier above: ")
             if selection =='1':
                 print("Verizon")
-                collectedNumbers[number] = "Verizon"
+                collectedNumbers[mynumber] = "Verizon"
             elif selection == '2':
                 print("T-Mobile")
-                collectedNumbers[number] = "T-Mobile"
+                collectedNumbers[mynumber] = "T-Mobile"
             elif selection == '3':
                 print("AT&T")
-                collectedNumbers[number] = "AT&T"
+                collectedNumbers[mynumber] = "AT&T"
             elif selection == '4':
                 print("Sprint")
-                collectedNumbers[number] = "Sprint"
+                collectedNumbers[mynumber] = "Sprint"
             elif selection == '5':
                 print("Boost Mobile")
-                collectedNumbers[number] = "Boost Mobile"
+                collectedNumbers[mynumber] = "Boost Mobile"
             elif selection == '6':
                 print("Cricket")
-                collectedNumbers[number] = "Cricket"
+                collectedNumbers[mynumber] = "Cricket"
             elif selection == '7':
                 print("Metro PCS")
-                collectedNumbers[number] = "Metro PCS"
+                collectedNumbers[mynumber] = "Metro PCS"
             elif selection == '8':
                 print("Tracfone")
-                collectedNumbers[number] = "Tracfone"
+                collectedNumbers[mynumber] = "Tracfone"
             elif selection == '9':
                 print("US Cellular")
-                collectedNumbers[number] = "US Cellular"
+                collectedNumbers[mynumber] = "US Cellular"
             elif selection == '10':
                 print("Virgin Mobile")
-                collectedNumbers[number] = "Virgin Mobile"
+                collectedNumbers[mynumber] = "Virgin Mobile"
             elif selection == '11':
                 otherCarrier = input("\r\n\r\nPlease enter a name for the Carrier: ")
                 print("Carrier recorded as : ")
@@ -131,6 +131,11 @@ def main():
             else:
                 print (2 * "\r\n", "Unknown Option Selected!", 2 * "\r\n")
             print("\r\n\r\nYou have entered %s numbers.\r" % mobileNumberCounter)
+            shallDefault = input("\r\n\r\nShall this number be used as the default for messages being addressed from you? (Y/N) ")
+            if shallDefault == ["Y"] or ["y"]:
+                defaultNumber = mynumber
+            else:
+                pass
             print("\r\n\r\nThe Numbers and carriers are: \r\n\r\n\r\n")
             print(collectedNumbers)
             anotherNumber = input("\r\n\r\nDo you have another mobile number to enter? (Y/N) ")
@@ -161,7 +166,7 @@ def main():
         else:  
             print("Successfully created the directory %s \r" % (smspath))
             time.sleep(5)
-        print("We will now open a browser to autohorize our use of your Google contacts for matching names to numbers...")
+        print("If necessary, we will now open a browser to autohorize our use of your Google contacts for matching names to numbers, but if you have authenticated using the script before, it likely won't be and this stage will just flash by with no intervention needed from the user...")
         time.sleep(1)
         #call the Google People API to get contact names and phone numbers and store them as a dict.
         
@@ -197,20 +202,40 @@ def main():
         print("...")
         time.sleep(2)
         print("...")
-            
+        
+        parsedGoogleContacts = {}    
         for person in connections:
             names = person.get('names', [])
             if names:
-                name = names[0].get('displayName')
-                print(name) 
+                nameFromGoogle = names[0].get('displayName')
             contactNumbers =  person.get('phoneNumbers',[])
             for number in contactNumbers: 
-                jsonReturn = json.dumps(contactNumbers)
-                jsonLoaded = json.loads(jsonReturn)
-                canonicalNumber = jsonLoaded[0].get('canonicalForm')
-                parsedGoogleContacts = {}
-                parsedGoogleContacts[name] = canonicalNumber
-                print(parsedGoogleContacts[name])
+                def extract_values(obj, key):
+                    """Pull all values of specified key from nested JSON."""
+                    arr = []
+                    def extract(obj, arr, key):
+                        """Recursively search for values of key in JSON tree."""
+                        if isinstance(obj, dict):
+                            for k, v in obj.items():
+                                if isinstance(v, (dict, list)):
+                                    extract(v, arr, key)
+                                elif k == key:
+                                    arr.append(v)
+                        elif isinstance(obj, list):
+                            for item in obj:
+                                extract(item, arr, key)
+                        return arr
+                    results = extract(obj, arr, key)
+                    return results
+                    canonicalNumber = extract_values('contactNumbers', 'canonicalForm')
+                    print(canonicalNumber)
+                    input("evaluate canonicalNumber!")
+                    stringifiedCanonicalNumber = str(canonicalNumber)
+                    strippedCanonicalNumber = stringifiedCanonicalNumber.strip('+1')
+                    print(strippedCanonicalNumber)
+                    input("evaluate strippedCanonicalnumber!")
+                    parsedGoogleContacts[nameFromGoogle] = strippedCanonicalNumber
+                    print(parsedGoogleContacts[nameFromGoogle])
             
 
             
@@ -256,10 +281,8 @@ def main():
             else:
                 strippedNumber = rawNumber
                 
-            if strippedNumber in parsedGoogleContacts:
-                gContactName = parsedGoogleContacts[canonicalNumber]
-            else:
-                gContactName = "Unknown"
+            
+            gContactName == parsedGoogleContacts[strippedCanonicalNumber]
 
 
             #Lookup the mobile carrier for that number and declare the correct SMS email address based the returned carrier
@@ -304,37 +327,37 @@ def main():
                 file.write("Message-ID: ")
                 file.write(message_id + "\r\n")
                 file.write("From: ")
-                    
-                if strippedNumber in collectedNumbers:
-                    if collectedNumbers[strippedNumber] == "Verizon":
-                        SMSemailSuffix = "@vtext.com"
-                    elif collectedNumbers[strippedNumber] == "T-Mobile":
+                
+                if i.getAttribute("type") == 1:
+                    if collectedNumbers[defaultNumber] == "Verizon":
+                        SMSemailSuffix = "vtext.com"
+                    elif collectedNumbers[defaultNumber] == "T-Mobile":
                         SMSemailSuffix = "tmomail.net"
-                    elif collectedNumbers[strippedNumber] == "AT&T":
+                    elif collectedNumbers[defaultNumber] == "AT&T":
                         SMSemailSuffix = "txt.att.net"
-                    elif collectedNumbers[strippedNumber] == "Sprint":            
+                    elif collectedNumbers[defaultNumber] == "Sprint":            
                         SMSemailSuffix = "messaging.sprintpcs.com"
-                    elif collectedNumbers[strippedNumber] == "Boost Mobile":
+                    elif collectedNumbers[defaultNumber] == "Boost Mobile":
                         SMSemailSuffix = "myboostmobile.com"
-                    elif collectedNumbers[strippedNumber] == "Cricket":
+                    elif collectedNumbers[defaultNumber] == "Cricket":
                         SMSemailSuffix = "sms.mycricket.com"
-                    elif collectedNumbers[strippedNumber] == "Metro PCS":
+                    elif collectedNumbers[defaultNumber] == "Metro PCS":
                         SMSemailSuffix = "mymetropcs.com"
-                    elif collectedNumbers[strippedNumber] == "Tracfone":
+                    elif collectedNumbers[defaultNumber] == "Tracfone":
                         SMSemailSuffix = "mmst5.tracfone.com"
-                    elif collectedNumbers[strippedNumber] == "US Cellular":
+                    elif collectedNumbers[defaultNumber] == "US Cellular":
                         SMSemailSuffix = "email.uscc.net"
-                    elif collectedNumbers[strippedNumber] == "Virgin Mobile":
+                    elif collectedNumbers[defaultNumber] == "Virgin Mobile":
                         SMSemailSuffix = "vmobl.com"
-                    elif collectedNumbers[strippedNumber] == "Other":
+                    elif collectedNumbers[defaultNumber] == "Other":
                         pass
                     else:
                         SMSemailSuffix = "unknown-carrier.net" 
-                    file.write(gContactName +" <" + SMSemailAddress + ">" + "\r\nTo: " + name + " <" + strippedNumber  + "@" + SMSemailSuffix + ">\r\n")
+                    file.write(gContactName +" <" + SMSemailAddress + ">" + "\r\nTo: " + myname + " <" + defaultNumber  + "@" + SMSemailSuffix + ">\r\n")
 
                 else:
                     SMSemailSuffix = "unknown-carrier.net"
-                    file.write(name + " <" + strippedNumber + "@" + SMSemailSuffix + ">\r\nTo: " + gContactName + " <" + SMSemailAddress + ">\r\n")
+                    file.write(myname + " <" + defaultNumber + "@" + SMSemailSuffix + ">\r\nTo: " + gContactName + " <" + SMSemailAddress + ">\r\n")
                     file.write("Subject: [SMS] ")
                     file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
                     file.write(i.getAttribute("body"))
