@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!env/bin/python
 #Copyright (C) 2019 CK Cameron (chase@ckcameron.net)
 #
 #This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -44,13 +44,7 @@ def main():
         print ("This script will parse an XML file and output a .mbox file in the current directory\r\n and a directory named sms both containing all of the messages found in the XML file.", 2 * "\r\n")
         time.sleep(3)
         print("The script is intended only to parse XML output from the Android application SMS Backup and Restore and will work with no other format.", 2 * "\r\n", "Please note that MMS and advanced message content are not supported yet.", 2 * "\r\n")
-        time.sleep(3)
-        print("The script makes a few basic assumptions about the backup it is parsing:", 2 * "\r\n")
-        time.sleep(3)
-        print("1. The contact names from your contacts application have been associated with their appriate message and anything without a contact name will be marked as from Unknown for the time being until I can get API approoval from Google to check your Google contacts for the number", 2 * "\r\n")
-        time.sleep(3)
-        print("2. The mail client you are using can import the .mbox format, or the .eml files output in the newly created sms directory. Both the directory and mbox file will appear whereever you ran this script", 4 * "\r\n")
-        time.sleep(2)
+        time.sleep(5)
 
         #gather user input for name, mobile number, carrier, desired filename and backuplocation
     
@@ -182,24 +176,27 @@ def main():
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server()
-            # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    'credentials.json', SCOPES)
+                creds = flow.run_local_server()
+        # Save the credentials for the next run
+            with open('token.pickle', 'wb') as token:
+                pickle.dump(creds, token)
 
         service = build('people', 'v1', credentials=creds)
         print("Great! Now please wait just a moment while we parse your contact data...")
         #get their google contact names and numbers
 
         results = service.people().connections().list(
-        resourceName='people/me',
-        pageSize=1000,
-        personFields='names,phoneNumbers').execute()
+            resourceName='people/me',
+            pageSize=1000,
+            personFields='names,phoneNumbers').execute()
         connections = results.get('connections', [])
-
+        time.sleep(2)
+        print("...")
+        time.sleep(2)
+        print("...")
         #declare a dict to stick contact data in
 
         googleContacts = {}
@@ -208,12 +205,21 @@ def main():
             names = person.get('names', [])
             if names:
                 name = names[0].get('displayName')
-            contactNumbers =  person.get('phoneNumbers',[])
-            googleContacts[name] = contactNumbers 
+                contactNumbers =  person.get('phoneNumbers',[])
+                for number in contactNumbers:
+                    googleContacts[name] = number 
             
 
             
-        print((3 * "\r\n") + "Now the wreal work begins. The script will now parse your sms backupfile, match the necessary data, write the email headers and create the mbox file.\r\n\r\nIt slices.\r\n\r\nIt dices.\r\n\r\nIt circumcises...igotnothin'.\r\n Anyhow... hold on, this could take a while, depending on the number of messages being processed." + (2 * "\r\n"))
+        print((3 * "\r\n") + "Great. The script has sucessfully processed your Google Contacts for the needed data.\r\n\r\n...Now the real work begins. The script will now parse your sms backupfile, match the necessary data, write the email headers and create the mbox file.")
+        time.sleep(2)
+        print("\r\n\r\nIt slices.")
+        time.sleep(1)
+        print("\r\n\r\nIt dices."
+        time.sleep(1)
+        print("\r\n\r\nIt circumcises...")
+        time.sleep(1)
+        print("   ...igotnothin'.\r\n\r\nAnnnnnyhow... hold on, this could take a while, depending on the number of messages being processed." + (2 * "\r\n"))
     
             #parse the backup file by XML tag atttribute
     
@@ -336,27 +342,20 @@ def main():
                     file.write(i.getAttribute("body"))
                     file.close()
                     
-                    #define a function and a try loop for adding the eml files to the mbox file
-
-                    def addEMLtoMbox(file, dest_mbox):
-                        try:
-                            dest_mbox.add(file)
-                        except:
-                            dest_mbox.close()
-                            raise
-
                     #reopen the file and add it to the mbox now that it is complete
 
                     with open(filepath, "rb") as file:
                         dest_mbox.lock()
                         addEMLtoMbox(file, dest_mbox)
                         file.close()
+                        dest_mbox.close()
                         dest_mbox.unlock()
                         smscounter = (smscounter + 1)
                     stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
-            print(2 * "\r\n")       
-            stdout.flush();
-            print("************************************\r\n***********************************\r\nProcessing of the SMS backup file is complete. Find the eml files in the sms directory or they are all included in the mbox file just created with the name of your choosing.") 
+        stdout.flush();
+        print(2 * "\r\n")       
+            
+        print("************************************\r\n***********************************\r\nProcessing of the SMS backup file is complete. Find the eml files in the sms directory or they are all included in the mbox file just created with the name of your choosing.") 
         return 0
 
                             
