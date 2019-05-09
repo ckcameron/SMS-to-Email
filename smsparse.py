@@ -207,7 +207,13 @@ def main():
                 name = names[0].get('displayName')
                 contactNumbers =  person.get('phoneNumbers',[])
                 for number in contactNumbers:
-                    googleContacts[name] = number 
+                    googleContacts[name] = jsonReply 
+                    jsonNumberReturn = json.loads(googleContacts[jsonReply])
+                    for listing in jsonNumberReturn:
+                        canonicalNumber = jsonNumberReturn['listing'][0]['canonicalForm']
+                        parsedGoogleContacts = {}
+                        parsedGoogleContacts[name] = canonicalNumber
+                        print(parsedGoogleContacts[name])
             
 
             
@@ -244,11 +250,6 @@ def main():
             filename = (i.getAttribute("contact_name") + " " + i.getAttribute("readable_date") + ".eml")
             rel_path = "sms/"
             filepath = os.path.join(script_dir, rel_path, filename)
-                
-            #For now we will rely on the contact anme in the backup file, but in the future 
-            #we will run the numbers against Google Contacts to retrieve the updated information
-                
-                       
                 
             #format the phone number into something we can work with
                 
@@ -345,13 +346,12 @@ def main():
                     #reopen the file and add it to the mbox now that it is complete
 
                     with open(filepath, "rb") as file:
-                        dest_mbox.lock()
                         addEMLtoMbox(file, dest_mbox)
                         file.close()
-                        dest_mbox.close()
-                        dest_mbox.unlock()
+                        dest_mbox.flush()
                         smscounter = (smscounter + 1)
-                    stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
+                dest_mbox.close()
+                stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
         stdout.flush();
         print(2 * "\r\n")       
             
