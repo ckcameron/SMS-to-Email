@@ -1,6 +1,6 @@
 env/
-credentials.json
 token.pickle
 *.lock
 *.mbox
 sms/
+*conf*
