@@ -228,28 +228,32 @@ def main():
                     results = extract(obj, arr, key)
                     return results
                     canonicalNumber = extract_values('contactNumbers', 'canonicalForm')
-                    print(canonicalNumber)
-                    input("evaluate canonicalNumber!")
                     stringifiedCanonicalNumber = str(canonicalNumber)
                     strippedCanonicalNumber = stringifiedCanonicalNumber.strip('+1')
-                    print(strippedCanonicalNumber)
-                    input("evaluate strippedCanonicalnumber!")
                     parsedGoogleContacts[nameFromGoogle] = strippedCanonicalNumber
                     print(parsedGoogleContacts[nameFromGoogle])
             
 
             
-        print((3 * "\r\n") + "Great. The script has sucessfully processed your Google Contacts for the needed data.\r\n\r\n...Now the real work begins. The script will now parse your sms backupfile, match the necessary data, write the email headers and create the mbox file.")
+        print((3 * "\r\n") + "Great. The script has sucessfully processed your Google Contacts for the needed data.\r\n\r\n\r\nThis script offers the ability to have all of the numbers for your contacts checked against numverify (a commercial phone number validation API) . Thee advantage of this is having the correct carrier information and therefore the correct SMS email addresses for all of your contacts and messages.\r\n\r\nThis is --not-- free.\r\n\r\nAgain:\rn\r\n\r\n this is not free.\r\n\r\n\r\nnumverify allows up to 250 API calls a month for free but beyond that you are going to need to go to numverify.com and sign up for an API key and set-up billing. 5000 calls per month is ten bucks and that is more than adequate for addressing most people's SMS needs. \r\n\r\n")
+        numverifyOrNot = input("Would you like to use the numverify service to get the carrier data for each of your contacts? (Y/N) ")
+        if numverifyOrNot == "Y" or numverifyOrNot == "y":
+            numverifyAPIkey = input("\r\n\r\n\r\nPlease enter your numverify API key: ")
+        else:
+            pass
+        print("\r\n\r\nAwesome.\r\n...Now the real work begins. The script will now parse your sms backupfile, match the necessary data, write the email headers and create the mbox file.")
         time.sleep(2)
         print("\r\n\r\nIt slices...")
         time.sleep(1)
         print("\r\n\r\nIt dices...")
         time.sleep(1)
         print("\r\n\r\nIt circumcises...")
+        time.sleep(2)
+        print("   ...")
         time.sleep(1)
-        print("   ...igotnothin'.\r\n\r\nAnnnnnyhow... hold on, this could take a while, depending on the number of messages being processed." + (2 * "\r\n"))
+        print("...igotnothin'.\r\n\r\nAnnnnnnnnnnnnyhow... hold on, this could take a while, depending on the number of messages being processed." + (2 * "\r\n"))
     
-            #parse the backup file by XML tag atttribute
+        #parse the backup file by XML tag atttribute
     
         doc = minidom.parse(infile_name)
         sms = doc.getElementsByTagName("sms") 
@@ -280,17 +284,22 @@ def main():
                 strippedNumber = rawNumber.strip('+1')
             else:
                 strippedNumber = rawNumber
-                
+            if (numverifyOrNot == ["Y"] or numverifyOrNot == "y") and strippedNumber not in collectedNumbers: 
+                url = 'http://apilayer.net/api/validate?access_key=' + numverifyAPIkey + '&number=' + strippedNumber
+                response = requests.get(url)
+                numverifyData = json.loads(response.text)
+                if numverifyData['valid'] == "false":
+                    mobileCarrier = "unknown"
+                elif numverifyData['valid'] == "true":    
+                    mobileCarrier = numverifyData['carrier']
+                    print(mobileCarrier)
+                    input("Evaluate mobileCarrier")
+            else:
+                mobileCarrier = "unknown"
             try:            
-                gContactName = parsedGoogleContacts[strippedNumber]
+                gContactName = parsedGoogleContacts['strippedNumber']
             except:
                 gContactName = i.getAttribute("contact_name")
-
-
-            #Lookup the mobile carrier for that number and declare the correct SMS email address based the returned carrier
-            #For now I cannot find a free way to do this, so I putting the feature on hold.
-
-            mobileCarrier = "unknown"
 
             if "Verizon" in mobileCarrier:
                 SMSemailAddress = (strippedNumber + "@vtext.com")
@@ -337,8 +346,7 @@ def main():
                         SMSemailSuffix = "tmomail.net"
                     elif collectedNumbers[defaultNumber] == "AT&T":
                         SMSemailSuffix = "txt.att.net"
-                    elif collectedNumbers[defaultNumber] == "Sprint":            
-                        SMSemailSuffix = "messaging.sprintpcs.com"
+                    elif collectedNumbers[defaultNumber] == "Sprint":                                   SMSemailSuffix = "messaging.sprintpcs.com"
                     elif collectedNumbers[defaultNumber] == "Boost Mobile":
                         SMSemailSuffix = "myboostmobile.com"
                     elif collectedNumbers[defaultNumber] == "Cricket":
