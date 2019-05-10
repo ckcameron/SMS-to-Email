@@ -281,8 +281,10 @@ def main():
             else:
                 strippedNumber = rawNumber
                 
-            
-            gContactName == parsedGoogleContacts[strippedCanonicalNumber]
+            try:            
+                gContactName = parsedGoogleContacts[strippedNumber]
+            except:
+                gContactName = i.getAttribute("contact_name")
 
 
             #Lookup the mobile carrier for that number and declare the correct SMS email address based the returned carrier
@@ -328,7 +330,7 @@ def main():
                 file.write(message_id + "\r\n")
                 file.write("From: ")
                 
-                if i.getAttribute("type") == 1:
+                if i.getAttribute("type") == 1 :
                     if collectedNumbers[defaultNumber] == "Verizon":
                         SMSemailSuffix = "vtext.com"
                     elif collectedNumbers[defaultNumber] == "T-Mobile":
