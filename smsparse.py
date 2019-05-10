@@ -63,7 +63,11 @@ def main():
                 mynumber =  input("\r\n\r\nPlease enter your 10-digit mobile number: ")
             time.sleep(1)
             print("\r\nMobile number recorded as: " + mynumber + (2 * "\r\n"))
-        
+            shallDefault = input("\r\n\r\nShall this number be used as the default for messages being addressed from you? (Y/N) ")
+            if shallDefault == "Y" or shallDefault == "y":
+                defaultNumber = mynumber
+            else:
+                pass
            
             #a menu for selecting the mobile carrier (US Specific)
 
@@ -90,33 +94,53 @@ def main():
             if selection =='1':
                 print("Verizon")
                 collectedNumbers[mynumber] = "Verizon"
+                if shallDefault == "Y" or shallDefault == "y":
+                    SMSEmailSuffix = "vtext.com"
             elif selection == '2':
                 print("T-Mobile")
                 collectedNumbers[mynumber] = "T-Mobile"
+                if shallDefault == "Y" or shallDefault == "y":
+                    SMSEmailSuffix = "tmomail.net"
             elif selection == '3':
                 print("AT&T")
                 collectedNumbers[mynumber] = "AT&T"
+                if shallDefault == "Y" or shallDefault == "y":
+                    SMSEmailSuffix = "txt.att.net"
             elif selection == '4':
                 print("Sprint")
                 collectedNumbers[mynumber] = "Sprint"
+                if shallDefault == "Y" or shallDefault == "y":
+                     SMSEmailSuffix = "messaging.sprintpcs.com"               
             elif selection == '5':
                 print("Boost Mobile")
                 collectedNumbers[mynumber] = "Boost Mobile"
+                if shallDefault == "Y" or shallDefault == "y":
+                    SMSEmailSuffix = "myboostmobile.com"            
             elif selection == '6':
                 print("Cricket")
                 collectedNumbers[mynumber] = "Cricket"
+                if shallDefault == "Y" or shallDefault == "y":
+                    SMSEmailSuffix = "sms.mycricket.com" 
             elif selection == '7':
                 print("Metro PCS")
                 collectedNumbers[mynumber] = "Metro PCS"
+                if shallDefault == "Y" or shallDefault == "y":
+                    SMSEmailSuffix = "mymetropcs.com" 
             elif selection == '8':
                 print("Tracfone")
                 collectedNumbers[mynumber] = "Tracfone"
+                if shallDefault == "Y" or shallDefault == "y":
+                    SMSEmailSuffix = "mmst5.tracfone.com" 
             elif selection == '9':
                 print("US Cellular")
                 collectedNumbers[mynumber] = "US Cellular"
+                if shallDefault == "Y" or shallDefault == "y":
+                    SMSEmailSuffix = "email.uscc.net" 
             elif selection == '10':
                 print("Virgin Mobile")
                 collectedNumbers[mynumber] = "Virgin Mobile"
+                if shallDefault == "Y" or shallDefault == "y":
+                    SMSEmailSuffix = "vmobl.com" 
             elif selection == '11':
                 otherCarrier = input("\r\n\r\nPlease enter a name for the Carrier: ")
                 print("Carrier recorded as : ")
@@ -131,11 +155,6 @@ def main():
             else:
                 print (2 * "\r\n", "Unknown Option Selected!", 2 * "\r\n")
             print("\r\n\r\nYou have entered %s numbers.\r" % mobileNumberCounter)
-            shallDefault = input("\r\n\r\nShall this number be used as the default for messages being addressed from you? (Y/N) ")
-            if shallDefault == ["Y"] or ["y"]:
-                defaultNumber = mynumber
-            else:
-                pass
             print("\r\n\r\nThe Numbers and carriers are: \r\n\r\n\r\n")
             print(collectedNumbers)
             anotherNumber = input("\r\n\r\nDo you have another mobile number to enter? (Y/N) ")
@@ -146,8 +165,9 @@ def main():
                     break
             else: 
                 break
+           
+        #continue gathering necessary information
         
-            #continue gathering necessary information
         time.sleep(2)
         infile_name = input("\r\n\r\nPlease give the absolute path of the backup file (.xml file): ")
         dest_name = (input("\r\n\r\nPlease provide a name for the mailbox you would like to create (the .mbox at the end of the filename will be added for you): ") + ".mbox")
@@ -284,18 +304,18 @@ def main():
                 strippedNumber = rawNumber.strip('+1')
             else:
                 strippedNumber = rawNumber
-            if (numverifyOrNot == ["Y"] or numverifyOrNot == "y") and strippedNumber not in collectedNumbers: 
-                url = 'http://apilayer.net/api/validate?access_key=' + numverifyAPIkey + '&number=' + strippedNumber
+            mobileCarrier = "unknown"
+            if numverifyOrNot == "Y" or numverifyOrNot == "y": 
+                url = 'http://apilayer.net/api/validate?access_key=' + numverifyAPIkey + '&number=1' + strippedNumber
                 response = requests.get(url)
                 numverifyData = json.loads(response.text)
                 if numverifyData['valid'] == "false":
                     mobileCarrier = "unknown"
-                elif numverifyData['valid'] == "true":    
-                    mobileCarrier = numverifyData['carrier']
-                    print(mobileCarrier)
-                    input("Evaluate mobileCarrier")
-            else:
-                mobileCarrier = "unknown"
+                else:    
+                    try:
+                        mobileCarrier = numverifyData['carrier']
+                    except:
+                        mobileCarrier = "unknown"
             try:            
                 gContactName = parsedGoogleContacts['strippedNumber']
             except:
@@ -321,8 +341,6 @@ def main():
                 SMSemailAddress = (strippedNumber +"@email.uscc.net")
             elif "Virgin" in mobileCarrier:
                 SMSemailAddress = (strippedNumber + "@vmobl.com")
-            elif mobileCarrier == "unknown":
-                SMSemailAddress = (strippedNumber + "@unknown-carrier.net")
             else:
                 SMSemailAddress = (strippedNumber + "@unknown-carrier.net")
                
@@ -340,34 +358,10 @@ def main():
                 file.write("From: ")
                 
                 if i.getAttribute("type") == 1 :
-                    if collectedNumbers[defaultNumber] == "Verizon":
-                        SMSemailSuffix = "vtext.com"
-                    elif collectedNumbers[defaultNumber] == "T-Mobile":
-                        SMSemailSuffix = "tmomail.net"
-                    elif collectedNumbers[defaultNumber] == "AT&T":
-                        SMSemailSuffix = "txt.att.net"
-                    elif collectedNumbers[defaultNumber] == "Sprint":                                   SMSemailSuffix = "messaging.sprintpcs.com"
-                    elif collectedNumbers[defaultNumber] == "Boost Mobile":
-                        SMSemailSuffix = "myboostmobile.com"
-                    elif collectedNumbers[defaultNumber] == "Cricket":
-                        SMSemailSuffix = "sms.mycricket.com"
-                    elif collectedNumbers[defaultNumber] == "Metro PCS":
-                        SMSemailSuffix = "mymetropcs.com"
-                    elif collectedNumbers[defaultNumber] == "Tracfone":
-                        SMSemailSuffix = "mmst5.tracfone.com"
-                    elif collectedNumbers[defaultNumber] == "US Cellular":
-                        SMSemailSuffix = "email.uscc.net"
-                    elif collectedNumbers[defaultNumber] == "Virgin Mobile":
-                        SMSemailSuffix = "vmobl.com"
-                    elif collectedNumbers[defaultNumber] == "Other":
-                        pass
-                    else:
-                        SMSemailSuffix = "unknown-carrier.net" 
-                    file.write(gContactName +" <" + SMSemailAddress + ">" + "\r\nTo: " + myname + " <" + defaultNumber  + "@" + SMSemailSuffix + ">\r\n")
+                    file.write(gContactName +" <" + SMSemailAddress + ">" + "\r\nTo: " + myname + " <" + defaultNumber  + "@" + SMSEmailSuffix + ">\r\n")
 
                 else:
-                    SMSemailSuffix = "unknown-carrier.net"
-                    file.write(myname + " <" + defaultNumber + "@" + SMSemailSuffix + ">\r\nTo: " + gContactName + " <" + SMSemailAddress + ">\r\n")
+                    file.write(myname + " <" + defaultNumber + "@" + SMSEmailSuffix + ">\r\nTo: " + gContactName + " <" + SMSemailAddress + ">\r\n")
                     file.write("Subject: [SMS] ")
                     file.write(i.getAttribute("body") + "\r\nX-SMS: true\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n")
                     file.write(i.getAttribute("body"))
