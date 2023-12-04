@@ -32,19 +32,23 @@ from google.auth.transport.requests import Request
 
 SCOPES = ['https://www.googleapis.com/auth/contacts.readonly'] 
 
-
+global macOS = 0
 global debug
 debug = True
 
 def main():
-
+        '''This is the Big enchilada which will check to see what OS you are working wihtin, gather the necessary data, and process your input files'''
+        #Check for macOS
+        if macOS in platform.platform():
+            global macOS=1
+            else: pass
         #Print basic inforamtion about the script
     
         print ("This script will parse an XML file and output a .mbox file in the current directory\r\n and a directory named sms both containing all of the messages found in the XML file.", 2 * "\r\n")
         time.sleep(3)
         print("The script is intended only to parse XML output from the Android application SMS Backup and Restore and will work with no other format.", 2 * "\r\n", "Please note that MMS and advanced message content are not supported yet.", 2 * "\r\n")
         time.sleep(5)
-
+        
         #gather user input for name, mobile number, carrier, desired filename and backuplocation
     
         myname = input("Please enter your name as you would like it to appear in the To and From fields in the emails generated: ")
