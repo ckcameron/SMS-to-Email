@@ -5,3 +5,8 @@ token.pickle
 sms/
 *conf*
 credentials.json
+*bfg-report*
+*.swp
+*pyvenv*
+lib
+bin
