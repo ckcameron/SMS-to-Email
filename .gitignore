@@ -4,3 +4,4 @@ token.pickle
 *.mbox
 sms/
 *conf*
+credentials.json
