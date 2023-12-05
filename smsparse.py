@@ -1,4 +1,4 @@
-#!env/bin/python
+#!bin/python
 #Copyright (C) 2019 CK Cameron (chase@ckcameron.net)
 #
 #This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -22,9 +22,11 @@ import sys
 from sys import *
 import shutil
 import time
+import py-imessage
 import unicodedata
 import requests
 import pickle
+import platform
 import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -32,16 +34,17 @@ from google.auth.transport.requests import Request
 
 SCOPES = ['https://www.googleapis.com/auth/contacts.readonly'] 
 
-global macOS = 0
 global debug
 debug = True
-
 def main():
         '''This is the Big enchilada which will check to see what OS you are working wihtin, gather the necessary data, and process your input files'''
         #Check for macOS
-        if macOS in platform.platform():
-            global macOS=1
-            else: pass
+        macOS = 0
+        if "macOS" in platform.platform():
+            macOS = 1
+        else: 
+            pass
+        
         #Print basic inforamtion about the script
     
         print ("This script will parse an XML file and output a .mbox file in the current directory\r\n and a directory named sms both containing all of the messages found in the XML file.", 2 * "\r\n")
@@ -82,6 +85,8 @@ def main():
                 print("3.  AT&T")
                 print("4.  Sprint")
                 print("5.  Boost Mobile")
+                print("6.  Cricket")
+                print("6.  Cricket")
                 print("6.  Cricket")
                 print("7.  Metro PCS")
                 print("8.  Tracfone")
@@ -378,8 +383,6 @@ def main():
                         dest_mbox.add(file)
                         dest_mbox.flush()
                         dest_mbox.unlock()
-                        file.close()
-                        smscounter = (smscounter + 1)
                         stdout.write('Number of SMS files Processed: %s \r' % (smscounter))
         stdout.flush();
         print(2 * "\r\n")       
